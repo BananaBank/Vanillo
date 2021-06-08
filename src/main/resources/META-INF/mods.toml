@@ -1,0 +1,27 @@
+modLoader="javafml"
+loaderVersion="[36,)"
+license="All rights reserved"
+
+[[mods]]
+modId="vanillo"
+version="${file.jarVersion}"
+displayName="Vanillo"
+credits="The exaggerated swagger of the Rusty Team"
+authors="TheDarkColour, cfrishausen, DJRoundTable"
+description='''
+Adds a few Vanilla-esque features and tweaks
+'''
+
+[[dependencies.vanillo]]
+    modId="forge"
+    mandatory=true
+    versionRange="[36,)"
+    ordering="NONE"
+    side="BOTH"
+
+[[dependencies.vanillo]]
+    modId="minecraft"
+    mandatory=true
+    versionRange="[1.16.5,1.17)"
+    ordering="NONE"
+    side="BOTH"
