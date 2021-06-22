@@ -17,7 +17,7 @@ public enum VoidItemTier implements IItemTier {
      * Lazy values are loaded later so that the item is guaranteed to be registered by that time
      * This Lazy value contains the ingredient used to repair Void items in an Anvil
      */
-    public static final LazyValue<Ingredient> REPAIR_COST = new LazyValue(() -> Ingredient.of(VItems.VOID_CRYSTAL.get()));
+    public static final LazyValue<Ingredient> REPAIR_COST = new LazyValue(() -> Ingredient.of(VItems.VOID_SHARD.get()));
 
     @Override
     public int getUses() {

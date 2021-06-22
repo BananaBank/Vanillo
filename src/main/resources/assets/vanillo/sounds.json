@@ -1,0 +1,8 @@
+{
+  "recycler": {
+    "subtitle": "vanillo.subtitles.recycle",
+    "sounds": [
+      "vanillo:recycler/recycle"
+    ]
+  }
+}

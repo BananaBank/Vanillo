@@ -23,6 +23,7 @@ public class VBlockTagsProvider extends BlockTagsProvider {
         tag(BlockTags.RAILS).add(VBlocks.GLOWSTONE_RAIL.get());
         tag(BlockTags.RAILS).add(VBlocks.DIAMOND_POWERED_RAIL.get());
         tag(BlockTags.RAILS).add(VBlocks.NETHERITE_POWERED_RAIL.get());
+        tag(BlockTags.RAILS).add(VBlocks.VOID_POWERED_RAIL.get());
         tag(BlockTags.DRAGON_IMMUNE).add(VBlocks.VOID_ORE.get(), VBlocks.VOID_BLOCK.get());
         tag(BlockTags.WITHER_IMMUNE).add(VBlocks.VOID_ORE.get(), VBlocks.VOID_BLOCK.get());
     }

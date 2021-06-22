@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:block/rail_curved",
+  "textures": {
+    "rail": "vanillo:block/glowstone_rail_corner"
+  }
+}

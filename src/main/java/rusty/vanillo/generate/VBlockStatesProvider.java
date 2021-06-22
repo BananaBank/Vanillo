@@ -2,10 +2,14 @@ package rusty.vanillo.generate;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
+import net.minecraft.block.PoweredRailBlock;
 import net.minecraft.block.SlabBlock;
 import net.minecraft.data.DataGenerator;
+import net.minecraft.state.properties.RailShape;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.model.generators.BlockStateProvider;
+import net.minecraftforge.client.model.generators.ModelFile;
+import net.minecraftforge.client.model.generators.VariantBlockStateBuilder;
 import net.minecraftforge.common.data.ExistingFileHelper;
 import net.minecraftforge.fml.RegistryObject;
 import rusty.vanillo.Vanillo;
@@ -22,10 +26,10 @@ public class VBlockStatesProvider extends BlockStateProvider {
     @Override
     protected void registerStatesAndModels() {
         // Creating Models
-        dirtSlabModels(VBlocks.DIRT_SLAB, Blocks.DIRT);
-        dirtSlabModels(VBlocks.COARSE_DIRT_SLAB, Blocks.COARSE_DIRT);
+        //dirtSlabModels(VBlocks.DIRT_SLAB, Blocks.DIRT);
+        //dirtSlabModels(VBlocks.COARSE_DIRT_SLAB, Blocks.COARSE_DIRT);
 
-        // Creating Blockstates
+        // Creating Blockstates + Models
         ResourceLocation dirtLoc = mcLoc("block/" + Blocks.DIRT.getRegistryName().getPath());
         ResourceLocation coarseDirtLoc = mcLoc("block/" + Blocks.COARSE_DIRT.getRegistryName().getPath());
         // First parameter is slab block
@@ -33,22 +37,73 @@ public class VBlockStatesProvider extends BlockStateProvider {
         // Third parameter is slab texture
         slabBlock(VBlocks.DIRT_SLAB.get(), dirtLoc, dirtLoc);
         slabBlock(VBlocks.COARSE_DIRT_SLAB.get(), coarseDirtLoc, coarseDirtLoc);
+
+        // Brick Bricks
+        simpleBlock(VBlocks.BRICK_BRICKS.get());
+        slab(VBlocks.BRICK_BRICK_SLAB, modLoc("block/brick_bricks"));
+        stairsBlock(VBlocks.BRICK_BRICK_STAIRS.get(), modLoc("block/brick_bricks"));
+
+        // Stone Brick Bricks
+        simpleBlock(VBlocks.STONE_BRICK_BRICKS.get());
+        slab(VBlocks.STONE_BRICK_BRICK_SLAB, modLoc("block/stone_brick_bricks"));
+        stairsBlock(VBlocks.STONE_BRICK_BRICK_STAIRS.get(), modLoc("block/stone_brick_bricks"));
+
+        // Rails
+        poweredRail(VBlocks.DIAMOND_POWERED_RAIL);
+        poweredRail(VBlocks.NETHERITE_POWERED_RAIL);
+        poweredRail(VBlocks.VOID_POWERED_RAIL);
     }
 
-    public void dirtSlabModels(RegistryObject<SlabBlock> slab, Block baseBlock) {
-        String registryName = slab.get().getRegistryName().getPath(); // String registry name of the slab.
-        String registryNameBase = baseBlock.getRegistryName().getPath(); // String registry name of double slab block.
+    private void slab(RegistryObject<? extends SlabBlock> supplier, ResourceLocation texture) {
+        slabBlock(supplier.get(), texture, texture);
+    }
 
-        // Each Block needs two models, one for bottom slab and one for top.
-        models().getBuilder(registryName)
-                .parent(models().getExistingFile(mcLoc("block/slab"))) // Bottom slab specificaiton.
-                .texture("bottom", mcLoc("block/" + registryNameBase))
-                .texture("top", mcLoc("block/" + registryNameBase))
-                .texture("side", mcLoc("block/" + registryNameBase));
-        models().getBuilder(registryName)
-                .parent(models().getExistingFile(mcLoc("block/slab_top"))) // Top slab specification.
-                .texture("bottom", mcLoc("block/" + registryNameBase))
-                .texture("top", mcLoc("block/" + registryNameBase))
-                .texture("side", mcLoc("block/" + registryNameBase));
+    private void curvedRail(RegistryObject<Block> rail) {
+        String name = rail.get().getRegistryName().getPath();
+
+        ModelFile normalRail = railModel(name, "rail_flat", name);
+        ModelFile raisedNe = railModel(name + "_raised_ne", "template_rail_raised_ne", name);
+        ModelFile raisedSw = railModel(name + "raised_sw", "template_rail_raised_sw", name);
+        ModelFile corner = railModel(name + "_corner", "rail_curved", name + "_corner");
+    }
+
+    private void poweredRail(RegistryObject<Block> rail) {
+        String name = rail.get().getRegistryName().getPath();
+
+        // Unpowered models
+        ModelFile normalRail = railModel(name, "rail_flat", name);
+        ModelFile raisedNe = railModel(name + "_raised_ne", "template_rail_raised_ne", name);
+        ModelFile raisedSw = railModel(name + "raised_sw", "template_rail_raised_sw", name);
+
+        // Powered models
+        ModelFile normalRailOn = railModel(name + "_on", "rail_flat", name + "_on");
+        ModelFile raisedNeOn = railModel(name + "_on_raised_ne", "template_rail_raised_ne", name + "_on");
+        ModelFile raisedSwOn = railModel(name + "_on_raised_sw", "template_rail_raised_sw", name + "_on");
+
+        // Blockstate
+        VariantBlockStateBuilder builder = getVariantBuilder(rail.get());
+
+        poweredRailStates(builder, false, normalRail, raisedNe, raisedSw); // Add non powered rails
+        poweredRailStates(builder, true, normalRailOn, raisedNeOn, raisedSwOn); // Add powered rails
+    }
+
+    //private void curvedRailStates(VariantBlockStateBuilder builder, boolean )
+
+    private void poweredRailStates(VariantBlockStateBuilder builder, boolean isPoweredOn, ModelFile normal, ModelFile raisedNe, ModelFile raisedSw) {
+        VariantBlockStateBuilder.PartialBlockstate partialState = builder.partialState().with(PoweredRailBlock.POWERED, isPoweredOn);
+
+        partialState.with(PoweredRailBlock.SHAPE, RailShape.ASCENDING_EAST).modelForState().modelFile(raisedNe).rotationY(90).addModel();
+        partialState.with(PoweredRailBlock.SHAPE, RailShape.ASCENDING_NORTH).modelForState().modelFile(raisedNe).addModel();
+        partialState.with(PoweredRailBlock.SHAPE, RailShape.ASCENDING_SOUTH).modelForState().modelFile(raisedSw).addModel();
+        partialState.with(PoweredRailBlock.SHAPE, RailShape.ASCENDING_WEST).modelForState().modelFile(raisedSw).rotationY(90).addModel();
+        partialState.with(PoweredRailBlock.SHAPE, RailShape.EAST_WEST).modelForState().modelFile(normal).rotationY(90).addModel();
+        partialState.with(PoweredRailBlock.SHAPE, RailShape.NORTH_SOUTH).modelForState().modelFile(normal).addModel();
+    }
+
+    private ModelFile railModel(String modelName, String modelParent, String texture) {
+        return models().getBuilder(modelName)
+                .parent(new ModelFile.UncheckedModelFile(mcLoc("block/" + modelParent)))
+                .texture("rail", modLoc("block/" + texture));
     }
 }
+

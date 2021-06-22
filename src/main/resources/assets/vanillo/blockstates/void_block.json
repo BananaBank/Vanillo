@@ -1,0 +1,7 @@
+{
+  "variants": {
+    "": {
+      "model": "vanillo:block/void_block"
+    }
+  }
+}

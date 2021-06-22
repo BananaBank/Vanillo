@@ -60,7 +60,6 @@ public class VLootTableProvider extends LootTableProvider {
     // Add block loot tables
     private void addBlockLootTables() {
         // void equipment
-        dropSelf(VBlocks.VOID_ORE);
         dropSelf(VBlocks.VOID_BLOCK);
 
         // rails
@@ -68,6 +67,7 @@ public class VLootTableProvider extends LootTableProvider {
         dropSelf(VBlocks.GLOWSTONE_RAIL);
         dropSelf(VBlocks.DIAMOND_POWERED_RAIL);
         dropSelf(VBlocks.NETHERITE_POWERED_RAIL);
+        dropSelf(VBlocks.VOID_POWERED_RAIL);
 
         // extra slabs
         slabLootTable(VBlocks.DIRT_SLAB);

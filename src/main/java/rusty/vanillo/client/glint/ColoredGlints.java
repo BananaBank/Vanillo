@@ -6,6 +6,7 @@ import net.minecraft.client.renderer.IRenderTypeBuffer;
 import net.minecraft.client.renderer.RenderState;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
+import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import org.lwjgl.opengl.GL11;
 import rusty.vanillo.Vanillo;
@@ -23,7 +24,7 @@ import java.util.SortedMap;
  */
 public final class ColoredGlints {
     // Glint color names
-    private static final String[] COLORS = new String[] { "white", "orange", "magenta", "light_blue", "yellow", "lime", "pink", "gray", "light_gray", "cyan", "purple", "blue", "brown", "green", "red", "black", "rainbow" };
+    public static final String[] COLORS = new String[] { "white", "orange", "magenta", "light_blue", "yellow", "lime", "pink", "gray", "light_gray", "cyan", "purple", "blue", "brown", "green", "red", "black", "rainbow" };
     private static final int BUFFER_SIZE = 256;
 
     // Item render types
@@ -40,38 +41,42 @@ public final class ColoredGlints {
     private static final RenderType[] COLORED_DIRECT_ENTITY_GLINTS = new RenderType[COLORS.length];
 
     // Override default render type
-    public static RenderType getArmorGlint(boolean normal) {
-        int color = 2;
+    public static RenderType getArmorGlint(ItemStack stack, boolean normal) {
+        byte color = getGlintIndex(stack);
 
         return normal ? COLORED_ARMOR_GLINTS[color] : COLORED_ARMOR_ENTITY_GLINTS[color];
     }
 
     // Override default render type
-    public static RenderType getEntityGlint(boolean direct) {
-        int color = 2;
+    public static RenderType getEntityGlint(ItemStack stack, boolean direct) {
+        byte color = getGlintIndex(stack);
 
         return direct ? COLORED_DIRECT_ENTITY_GLINTS[color] : COLORED_ENTITY_GLINTS[color];
     }
 
     // Override default render type
-    public static RenderType getItemGlint(boolean direct) {
-        int color = 2;
+    public static RenderType getItemGlint(ItemStack stack, boolean direct) {
+        byte color = getGlintIndex(stack);
 
         return direct ? COLORED_DIRECT_GLINTS[color] : COLORED_GLINTS[color];
     }
 
     // Supports the Fabulous Graphics setting
-    public static RenderType getItemGlint(boolean fabulous, boolean direct) {
-        int color = 2;
+    public static RenderType getItemGlint(ItemStack stack, boolean fabulous, boolean direct) {
+        byte color = getGlintIndex(stack);
 
-        return fabulous ? COLORED_FABULOUS_GLINTS[color] : getItemGlint(direct);
+        return fabulous ? COLORED_FABULOUS_GLINTS[color] : getItemGlint(stack, direct);
     }
 
     // Override default render type
-    public static RenderType getDirectGlint(boolean entityGlint) {
-        int color = 2;
+    public static RenderType getDirectGlint(ItemStack stack, boolean entityGlint) {
+        byte color = getGlintIndex(stack);
 
         return entityGlint ? COLORED_DIRECT_ENTITY_GLINTS[color] : COLORED_DIRECT_GLINTS[color];
+    }
+
+    private static byte getGlintIndex(ItemStack stack) {
+        return stack.hasTag() && stack.getTag().contains("Glint") ? stack.getTag().getByte("Glint") : 2;
     }
 
     // Create all the glint render types

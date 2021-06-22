@@ -2,16 +2,18 @@ package rusty.vanillo;
 
 import net.minecraft.item.Item;
 import net.minecraft.item.Items;
+import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import rusty.vanillo.client.ClientHandler;
-import rusty.vanillo.registry.VBlocks;
-import rusty.vanillo.registry.VEnchantments;
-import rusty.vanillo.registry.VItems;
-import rusty.vanillo.registry.VTileEntities;
+import rusty.vanillo.command.GlintCommand;
+import rusty.vanillo.feature.VFeatures;
+import rusty.vanillo.recipe.ColoredGlintAnvilRecipe;
+import rusty.vanillo.registry.*;
 
 /**
  * @author TheDarkColour, cfrishausen, DJRoundTable
@@ -22,18 +24,32 @@ public final class Vanillo {
 
     public Vanillo() {
         final IEventBus modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
+        final IEventBus forgeEventBus = MinecraftForge.EVENT_BUS;
 
         // LOWEST priority; fires after every other mod
         modEventBus.addGenericListener(Item.class, EventPriority.LOWEST, this::onItemRegistry);
 
+        forgeEventBus.addListener(this::onRegisterCommands);
+        forgeEventBus.addListener(ColoredGlintAnvilRecipe::onAnvilUpdate);
+        forgeEventBus.addListener(VVillagerProfessions::addTrades);
+        forgeEventBus.addListener(VFeatures::onBiomeLoad);
+
+        // Registry classes
         VBlocks.BLOCKS.register(modEventBus);
         VItems.ITEMS.register(modEventBus);
         VEnchantments.ENCHANTMENTS.register(modEventBus);
         VTileEntities.TILE_ENTITIES.register(modEventBus);
-        ClientHandler.registerEvents();
+        VVillagerProfessions.PROFESSIONS.register(modEventBus);
+        VPointOfInterestTypes.POI_TYPES.register(modEventBus);
+        VSoundEvents.SOUND_EVENTS.register(modEventBus);
+        VContainerTypes.CONTAINERS.register(modEventBus);
+        VRecipeSerializers.SERIALIZERS.register(modEventBus);
 
-        // Register ourselves for server and other game events we are interested in
-        //MinecraftForge.EVENT_BUS.register(this);
+        ClientHandler.registerEvents();
+    }
+
+    public void onRegisterCommands(RegisterCommandsEvent event) {
+        GlintCommand.register(event.getDispatcher());
     }
 
     // Called after all other items are registered
