@@ -10,12 +10,13 @@ import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.Hand;
 import net.minecraft.util.Util;
-import rusty.vanillo.client.glint.ColoredGlints;
 
 public class GlintCommand {
+    // Copy here to avoid loading client-side code
+    private static final String[] COLOR_NAMES = new String[] { "white", "orange", "magenta", "light_blue", "yellow", "lime", "pink", "gray", "light_gray", "cyan", "purple", "blue", "brown", "green", "red", "black", "rainbow" };
     private static final Object2ByteMap<String> COLORS = Util.make(new Object2ByteOpenHashMap(17), map -> {
-        for (byte i = 0; i < ColoredGlints.COLORS.length; ++i) {
-            map.put(ColoredGlints.COLORS[i], i);
+        for (byte i = 0; i < COLOR_NAMES.length; ++i) {
+            map.put(COLOR_NAMES[i], i);
         }
     });
 

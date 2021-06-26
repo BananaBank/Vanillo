@@ -3,11 +3,11 @@ package rusty.vanillo.registry;
 import net.minecraft.block.AbstractBlock;
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
-import net.minecraft.block.HoneyBlock;
 import net.minecraft.block.SlabBlock;
 import net.minecraft.block.SoundType;
 import net.minecraft.block.StairsBlock;
 import net.minecraft.block.material.Material;
+import net.minecraft.state.properties.BlockStateProperties;
 import net.minecraftforge.common.ToolType;
 import net.minecraftforge.fml.RegistryObject;
 import net.minecraftforge.registries.DeferredRegister;
@@ -39,7 +39,7 @@ public final class VBlocks {
     public static final RegistryObject<StairsBlock> STONE_BRICK_BRICK_STAIRS = registerStairs("stone_brick_brick_stairs", STONE_BRICK_BRICKS);
 
     // Recycler
-    public static final RegistryObject<Block> RECYCLER = BLOCKS.register("recycler", () -> new RecyclerBlock(Block.Properties.of(Material.HEAVY_METAL).sound(SoundType.ANVIL).requiresCorrectToolForDrops().harvestTool(ToolType.PICKAXE)));
+    public static final RegistryObject<Block> RECYCLER = BLOCKS.register("recycler", () -> new RecyclerBlock(Block.Properties.of(Material.HEAVY_METAL).sound(SoundType.ANVIL).requiresCorrectToolForDrops().harvestTool(ToolType.PICKAXE).lightLevel(state -> state.getValue(BlockStateProperties.LIT) ? 13 : 0)));
 
     // Rails
     public static final RegistryObject<Block> WOODEN_RAIL = BLOCKS.register("wooden_rail", () -> new VRailBlock(0.1f, Block.Properties.of(Material.DECORATION).harvestTool(ToolType.AXE).sound(SoundType.LADDER).noCollission().strength(0.7F)));
@@ -49,10 +49,8 @@ public final class VBlocks {
     public static final RegistryObject<Block> VOID_POWERED_RAIL = BLOCKS.register("void_powered_rail", () -> new VPoweredRailBlock(2.5f, Block.Properties.of(Material.DECORATION).harvestTool(ToolType.PICKAXE).sound(SoundType.NETHERITE_BLOCK).noCollission().strength(0.7F).lightLevel(blockState -> 9)));
 
     // Void Equipment
-    public static final RegistryObject<Block> VOID_ORE = BLOCKS.register("void_ore", () -> new VoidOre(AbstractBlock.Properties.of(Material.METAL).sound(SoundType.ANCIENT_DEBRIS).harvestLevel(4).requiresCorrectToolForDrops().strength(50.0F, 1200.0F).lightLevel(blockState -> 13)));
-    public static final RegistryObject<Block> VOID_BLOCK = BLOCKS.register("void_block", () -> new Block(AbstractBlock.Properties.of(Material.METAL).sound(SoundType.NETHERITE_BLOCK).harvestLevel(4).requiresCorrectToolForDrops().strength(50.0F, 1200.0F).lightLevel(blockState -> 9).noOcclusion().isViewBlocking(NEVER)));
-
-    public static final RegistryObject<Block> MYSTERY_CUBE = BLOCKS.register("owo", () -> new HoneyBlock(AbstractBlock.Properties.of(Material.WEB).sound(SoundType.HONEY_BLOCK).noCollission()));
+    public static final RegistryObject<Block> VOID_ORE = BLOCKS.register("void_ore", () -> new VoidOre(AbstractBlock.Properties.of(Material.METAL).sound(SoundType.ANCIENT_DEBRIS).harvestTool(ToolType.PICKAXE).harvestLevel(4).requiresCorrectToolForDrops().strength(50.0F, 1200.0F).lightLevel(blockState -> 13)));
+    public static final RegistryObject<Block> VOID_BLOCK = BLOCKS.register("void_block", () -> new Block(AbstractBlock.Properties.of(Material.METAL).sound(SoundType.NETHERITE_BLOCK).harvestTool(ToolType.PICKAXE).harvestLevel(4).requiresCorrectToolForDrops().strength(50.0F, 1200.0F).lightLevel(blockState -> 9).noOcclusion().isViewBlocking(NEVER)));
 
     public static RegistryObject<SlabBlock> registerSlab(String name, Supplier<Block> block) {
         return registerCustomSlab(name, () -> AbstractBlock.Properties.copy(block.get()));

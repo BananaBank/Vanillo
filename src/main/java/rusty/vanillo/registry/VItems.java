@@ -18,7 +18,9 @@ import net.minecraftforge.registries.ForgeRegistries;
 import rusty.vanillo.Vanillo;
 import rusty.vanillo.item.VTab;
 import rusty.vanillo.item.VoidArmorMaterial;
+import rusty.vanillo.item.VoidBowItem;
 import rusty.vanillo.item.VoidItemTier;
+import rusty.vanillo.item.WoodenRailItem;
 
 import java.util.function.Function;
 
@@ -42,7 +44,7 @@ public final class VItems {
     public static final RegistryObject<Item> STONE_BRICK_BRICK_STAIRS = registerBlockItem(VBlocks.STONE_BRICK_BRICK_STAIRS);
 
     // Rails
-    public static final RegistryObject<Item> WOODEN_RAIL = registerBlockItem(VBlocks.WOODEN_RAIL);
+    public static final RegistryObject<Item> WOODEN_RAIL = ITEMS.register("wooden_rail", () -> new WoodenRailItem(VBlocks.WOODEN_RAIL.get(), new Item.Properties().tab(VTab.INSTANCE)));
     public static final RegistryObject<Item> GLOWSTONE_RAIL = registerBlockItem(VBlocks.GLOWSTONE_RAIL);
     public static final RegistryObject<Item> DIAMOND_POWERED_RAIL = registerBlockItem(VBlocks.DIAMOND_POWERED_RAIL);
     public static final RegistryObject<Item> NETHERITE_POWERED_RAIL = registerFireproofBlockItem(VBlocks.NETHERITE_POWERED_RAIL);
@@ -52,7 +54,7 @@ public final class VItems {
     public static final RegistryObject<Item> ENDER_OMELETTE = registerFoodItem("ender_omelette", 20, 1.5f);
 
     // Void Equipment
-    public static final RegistryObject<Item> VOID_ESSENCE = registerSimpleItem("void_essence", properties -> properties.fireResistant().rarity(Rarity.RARE));
+    //public static final RegistryObject<Item> VOID_ESSENCE = registerSimpleItem("void_essence", properties -> properties.fireResistant().rarity(Rarity.RARE));
     public static final RegistryObject<Item> VOID_CRYSTAL = registerSimpleItem("void_crystal", properties -> properties.fireResistant().rarity(Rarity.RARE));
     public static final RegistryObject<Item> VOID_SHARD = registerSimpleItem("void_shard", properties -> properties.fireResistant().rarity(Rarity.RARE));
     public static final RegistryObject<Item> VOID_ORE = registerVoidBlockItem(VBlocks.VOID_ORE);
@@ -61,13 +63,12 @@ public final class VItems {
     public static final RegistryObject<Item> VOID_LEGGINGS = registerVoidArmorItem("void_leggings", EquipmentSlotType.LEGS);
     public static final RegistryObject<Item> VOID_CHESTPLATE = registerVoidArmorItem("void_chestplate", EquipmentSlotType.CHEST);
     public static final RegistryObject<Item> VOID_HELMET = registerVoidArmorItem("void_helmet", EquipmentSlotType.HEAD);
+    public static final RegistryObject<Item> VOID_BOW = ITEMS.register("void_bow", () -> new VoidBowItem(new Item.Properties().fireResistant().defaultDurability(1569).rarity(Rarity.RARE).tab(VTab.INSTANCE)));
     public static final RegistryObject<Item> VOID_SWORD = ITEMS.register("void_sword", () -> new SwordItem(VoidItemTier.INSTANCE, 3, -2.4F, (new Item.Properties()).fireResistant().rarity(Rarity.RARE).tab(VTab.INSTANCE)));
     public static final RegistryObject<Item> VOID_SHOVEL = ITEMS.register("void_shovel", () -> new ShovelItem(VoidItemTier.INSTANCE, 1.5F, -3.0F, (new Item.Properties()).fireResistant().rarity(Rarity.RARE).tab(VTab.INSTANCE)));
     public static final RegistryObject<Item> VOID_PICKAXE = ITEMS.register("void_pickaxe", () -> new PickaxeItem(VoidItemTier.INSTANCE, 1, -2.8F, (new Item.Properties()).fireResistant().rarity(Rarity.RARE).tab(VTab.INSTANCE)));
     public static final RegistryObject<Item> VOID_AXE = ITEMS.register("void_axe", () -> new AxeItem(VoidItemTier.INSTANCE, 5.0F, -3.0F, (new Item.Properties()).fireResistant().rarity(Rarity.RARE).tab(VTab.INSTANCE)));
     public static final RegistryObject<Item> VOID_HOE = ITEMS.register("void_hoe", () -> new HoeItem(VoidItemTier.INSTANCE, -5, 0.0F, (new Item.Properties()).fireResistant().rarity(Rarity.RARE).tab(VTab.INSTANCE)));
-
-    public static final RegistryObject<Item> MYSTERY_CUBE = ITEMS.register("owo", () -> new BlockItem(VBlocks.MYSTERY_CUBE.get(), new Item.Properties().food(new Food.Builder().nutrition(1).saturationMod(0.2f).build())));
 
     // Recycler
     public static final RegistryObject<Item> RECYCLER = registerBlockItem(VBlocks.RECYCLER);
@@ -83,7 +84,6 @@ public final class VItems {
     
     public static RegistryObject<Item> registerFireproofBlockItem(RegistryObject<Block> block) {
         return ITEMS.register(block.getId().getPath(), () -> new BlockItem(block.get(), new Item.Properties().tab(VTab.INSTANCE).fireResistant()));
-        
     }
 
     // Register a simple item that doesn't do anything (like crafting materials)
@@ -97,7 +97,7 @@ public final class VItems {
         return ITEMS.register(name, () -> new ArmorItem(VoidArmorMaterial.INSTANCE, slot, new Item.Properties().fireResistant().rarity(Rarity.RARE).tab(VTab.INSTANCE)));
     }
 
-    public static RegistryObject<Item> registerFoodItem(String name, int a, float sat) {
-        return ITEMS.register(name, () -> new Item(new Item.Properties().food(new Food.Builder().nutrition(a).saturationMod(sat).build())));
+    public static RegistryObject<Item> registerFoodItem(String name, int nutrition, float saturation) {
+        return registerSimpleItem(name, properties -> properties.food(new Food.Builder().nutrition(nutrition).saturationMod(saturation).build()));
     }
 }

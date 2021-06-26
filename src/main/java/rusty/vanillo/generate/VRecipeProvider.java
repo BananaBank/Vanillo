@@ -35,9 +35,9 @@ public class VRecipeProvider extends RecipeProvider {
         createRailRecipes(consumer);
         createVoidEquipmentRecipes(consumer);
         addRecyclingRecipes(consumer);
-//        createFoodRecipes(consumer);
+        createBlockRecipes(consumer);
+        createFoodRecipes(consumer);
     }
-
 
     private void createSlabRecipes(Consumer<IFinishedRecipe> localConsumer) {
         // Puts slabs and their related blocks into map.
@@ -90,8 +90,21 @@ public class VRecipeProvider extends RecipeProvider {
         }
     }
 
-    private void createRailRecipes(Consumer<IFinishedRecipe> consumer) {
+    private void createBlockRecipes(Consumer<IFinishedRecipe> consumer) {
+        ShapedRecipeBuilder.shaped(VItems.RECYCLER.get(), 1)
+                .define('D', Tags.Items.STORAGE_BLOCKS_IRON)
+                .define('R', Tags.Items.GEMS_DIAMOND)
+                .define('S', Items.HOPPER)
+                .define('F', Items.SMOOTH_STONE)
+                .define('A', Items.BLAST_FURNACE)
+                .pattern(" R ")
+                .pattern("DSD")
+                .pattern("FAF")
+                .unlockedBy("has_item", has(Items.BLAST_FURNACE))
+                .save(consumer);
+    }
 
+    private void createRailRecipes(Consumer<IFinishedRecipe> consumer) {
         ShapedRecipeBuilder.shaped(VItems.DIAMOND_POWERED_RAIL.get(), 12)
                 .define('D', Tags.Items.GEMS_DIAMOND)
                 .define('R', Tags.Items.DUSTS_REDSTONE)
@@ -157,12 +170,13 @@ public class VRecipeProvider extends RecipeProvider {
                 .save(consumer);
     }
 
+
     private void createVoidEquipmentRecipes(Consumer<IFinishedRecipe> consumer) {
         Item voidIngot = VItems.VOID_SHARD.get();
 
         ShapelessRecipeBuilder.shapeless(VItems.VOID_SHARD.get())
                 .requires(VItems.VOID_CRYSTAL.get(), 4)
-                .requires(VItems.VOID_ESSENCE.get(), 1)
+                //.requires(VItems.VOID_ESSENCE.get(), 1)
                 .requires(Items.DRAGON_BREATH, 1)
                 .requires(Items.ENDER_EYE, 1)
                 .unlockedBy("has_item", has(VItems.VOID_CRYSTAL.get()))
@@ -179,6 +193,7 @@ public class VRecipeProvider extends RecipeProvider {
         smithing(consumer, Ingredient.of(Items.NETHERITE_PICKAXE), voidIngot, VItems.VOID_PICKAXE.get());
         smithing(consumer, Ingredient.of(Items.NETHERITE_AXE), voidIngot, VItems.VOID_AXE.get());
         smithing(consumer, Ingredient.of(Items.NETHERITE_HOE), voidIngot, VItems.VOID_HOE.get());
+        smithing(consumer, Ingredient.of(Items.BOW), voidIngot, VItems.VOID_BOW.get());
 
         // rails
         smithing(consumer, Ingredient.of(VItems.NETHERITE_POWERED_RAIL.get()), voidIngot, VItems.VOID_POWERED_RAIL.get());
@@ -237,110 +252,138 @@ public class VRecipeProvider extends RecipeProvider {
 
         // Resource 0.1f ; 100 - 125, Primitive 0.15f ; 125 - 150, Intermediate 0.35f - 0.7f ; 200 - 400, Advanced 0.7f - 1.0f ; 400 - 800
 
-        // Wool Recipes
+        // Wool Recycling Recipes
         recycling(consumer,
                 Ingredient.of(Items.WHITE_WOOL, Items.BLACK_WOOL, Items.GRAY_WOOL, Items.LIGHT_GRAY_WOOL, Items.BROWN_WOOL, Items.RED_WOOL, Items.ORANGE_WOOL, Items.YELLOW_WOOL, Items.LIME_WOOL, Items.GREEN_WOOL, Items.LIGHT_BLUE_WOOL, Items.CYAN_WOOL, Items.BLUE_WOOL, Items.PURPLE_WOOL, Items.MAGENTA_WOOL, Items.PINK_WOOL),
                 new ItemStack(Items.STRING, 2),
                 0.1f,
                 100); //TODO Add Loot table to output. Add dye drops to loot table
 
-        // Tile Entity Recipes
-        recycling(consumer, Items.FURNACE, new ItemStack(Items.COBBLESTONE, 6), 0.15f, 150);
+        // Tile Entity Recycling Recipes
+        recycling(consumer, Items.FURNACE, new ItemStack(Items.COBBLESTONE, 7), 0.15f, 150);
+        recycling(consumer, Items.ENDER_CHEST, new ItemStack(Items.OBSIDIAN, 5), 0.7f, 400); // Add Ender Eye to loot table
+        recycling(consumer, Items.CHEST, new ItemStack(Items.OAK_PLANKS, 6), 0.15f, 150);
+        recycling(consumer, Items.ENCHANTING_TABLE, new ItemStack(Items.OBSIDIAN, 4), 0.7f, 400); // Add Diamond and Book to loot table
+        recycling(consumer, Items.JUKEBOX, Items.DIAMOND, 0.35f, 200); //Add plalanks toloot table
         recycling(consumer, Items.SMOKER, new ItemStack(Items.OAK_LOG, 3), 0.15f, 150); // Add cobblestone to loot table
 
-        // Crafting Block Recipes
+        // Crafting Block Recycling Recipes
         recycling(consumer, Items.CRAFTING_TABLE, new ItemStack(Items.OAK_PLANKS, 3), 0.15f, 100);
         recycling(consumer, Items.ANVIL, new ItemStack(Items.IRON_BLOCK, 2), 0.7f, 400);
+        recycling(consumer, Items.BOOKSHELF, new ItemStack(Items.BOOK, 2), 0.15f, 150);
 
-        // Block Recipes
-        recycling(consumer, Items.PISTON, new ItemStack(Items.IRON_INGOT, 1), 0.35f, 200); // Add Planks, Cobblestone, redstone to loot table
-        recycling(consumer, Items.STICKY_PISTON, new ItemStack(Items.SLIME_BALL, 1), 0.35f, 200); // Add Iron, Planks, Cobblestone, redstone to loot table
+        // Block Recycling Recipes
+        recycling(consumer, Items.PISTON, Items.IRON_INGOT, 0.35f, 200); // Add Planks, Cobblestone, redstone to loot table
+        recycling(consumer, Items.STICKY_PISTON, Items.SLIME_BALL, 0.35f, 200); // Add Iron, Planks, Cobblestone, redstone to loot table
         recycling(consumer, Items.LADDER, new ItemStack(Items.STICK, 5), 0.1f, 100);
         recycling(consumer, Items.LANTERN, new ItemStack(Items.IRON_NUGGET, 6), 0.35f, 200);
         recycling(consumer, Items.OBSERVER, new ItemStack(Items.QUARTZ, 2), 0.35f, 200);
         recycling(consumer, Items.CHAIN, new ItemStack(Items.IRON_INGOT, 1), 0.35f, 200);
+        recycling(consumer, Items.TNT, new ItemStack(Items.GUNPOWDER, 3), 0.15f, 150);
 
-
-        // Item Recipes
+        // Item Recycling Recipes
 
         recycling(consumer, Items.COMPASS, new ItemStack(Items.IRON_INGOT, 2), 0.35f, 200);
         recycling(consumer, Items.CLOCK, new ItemStack(Items.GOLD_INGOT, 2), 0.35f, 200);
         recycling(consumer, Items.SADDLE, new ItemStack(Items.LEATHER, 5), 0.15f, 150);
+        recycling(consumer, Items.BUCKET, new ItemStack(Items.IRON_INGOT, 2), 0.35f, 200);
+        recycling(consumer, Items.ARMOR_STAND, new ItemStack(Items.STICK, 3), 0.15f, 150);
         recycling(consumer, Items.VILLAGER_SPAWN_EGG, new ItemStack(Items.EMERALD, 3), 1.0f, 800);
 
-        // Tool Recipes
+        // Tool Recycling Recipes
 
         recycling(consumer,
                 Ingredient.of(Items.WOODEN_AXE, Items.WOODEN_HOE, Items.WOODEN_PICKAXE, Items.WOODEN_SHOVEL, Items.WOODEN_SWORD),
                 new ItemStack(Items.STICK, 3),
                 0.15f,
-                100);
+                100,
+                "_tools");
 
         recycling(consumer,
                 Ingredient.of(Items.STONE_AXE, Items.STONE_HOE, Items.STONE_PICKAXE, Items.STONE_SHOVEL, Items.STONE_SWORD),
                 new ItemStack(Items.COBBLESTONE, 1),
                 0.15f,
-                125);
+                125,
+                "_tools");
 
         recycling(consumer,
                 Ingredient.of(Items.IRON_AXE, Items.IRON_HOE, Items.IRON_PICKAXE, Items.IRON_SHOVEL, Items.IRON_SWORD),
                 new ItemStack(Items.IRON_INGOT, 1),
                 0.35f,
-                200);
+                200,
+                "_tools"
+        );
 
         recycling(consumer,
                 Ingredient.of(Items.GOLDEN_AXE, Items.GOLDEN_HOE, Items.GOLDEN_PICKAXE, Items.GOLDEN_SHOVEL, Items.GOLDEN_SWORD),
                 new ItemStack(Items.GOLD_INGOT, 1),
                 0.35f,
-                200);
+                200,
+                "_tools");
 
         recycling(consumer,
                 Ingredient.of(Items.DIAMOND_AXE, Items.DIAMOND_HOE, Items.DIAMOND_PICKAXE, Items.DIAMOND_SHOVEL, Items.DIAMOND_SWORD),
                 new ItemStack(Items.DIAMOND, 1),
                 0.7f,
-                400);
+                400,
+                "_tools");
 
         recycling(consumer,
                 Ingredient.of(Items.NETHERITE_AXE, Items.NETHERITE_HOE, Items.NETHERITE_PICKAXE, Items.NETHERITE_SHOVEL, Items.NETHERITE_SWORD),
                 new ItemStack(Items.NETHERITE_SCRAP, 3),
                 1.0f,
-                800);
+                800,
+                "_tools");
 
-        // Armor Recipes
+        recycling(consumer,
+                Ingredient.of(VItems.VOID_AXE.get(), VItems.VOID_HOE.get() , VItems.VOID_PICKAXE.get(), VItems.VOID_SHOVEL.get(), VItems.VOID_SWORD.get()),
+                new ItemStack(VItems.VOID_CRYSTAL.get(), 3),
+                1.0f,
+                800,
+                "_tools");
+
+        // Armor Recycling Recipes
 
         recycling(consumer,
                 Ingredient.of(Items.LEATHER_HELMET, Items.LEATHER_CHESTPLATE, Items.LEATHER_LEGGINGS, Items.LEATHER_BOOTS),
                 new ItemStack(Items.LEATHER, 2),
                 0.15f,
-                150);
+                150,
+                "_armor");
 
         recycling(consumer,
                 Ingredient.of(Items.IRON_HELMET, Items.IRON_CHESTPLATE, Items.IRON_LEGGINGS, Items.IRON_BOOTS),
                 new ItemStack(Items.IRON_INGOT, 2),
                 0.35f,
-                200);
+                200,
+                "_armor");
 
         recycling(consumer,
                 Ingredient.of(Items.GOLDEN_HELMET, Items.GOLDEN_CHESTPLATE, Items.GOLDEN_LEGGINGS, Items.GOLDEN_BOOTS),
                 new ItemStack(Items.GOLD_INGOT, 2),
                 0.35f,
-                200);
+                200,
+                "_armor");
 
         recycling(consumer,
                 Ingredient.of(Items.DIAMOND_HELMET, Items.DIAMOND_CHESTPLATE, Items.DIAMOND_LEGGINGS, Items.DIAMOND_BOOTS),
                 new ItemStack(Items.DIAMOND, 2),
                 0.7f,
-                400);
+                400,
+                "_armor");
 
         recycling(consumer,
                 Ingredient.of(Items.NETHERITE_HELMET, Items.NETHERITE_CHESTPLATE, Items.NETHERITE_LEGGINGS, Items.NETHERITE_BOOTS),
                 new ItemStack(Items.NETHERITE_SCRAP, 11),
                 1.0f,
-                800);
+                800,
+                "_armor");
 
-    }
-
-    private void testRecyclerRecipe() {
-
+        recycling(consumer,
+                Ingredient.of(VItems.VOID_HELMET.get(), VItems.VOID_CHESTPLATE.get() , VItems.VOID_LEGGINGS.get(), VItems.VOID_BOOTS.get()),
+                new ItemStack(VItems.VOID_CRYSTAL.get(), 11),
+                1.0f,
+                800,
+                "_armor");
     }
 }

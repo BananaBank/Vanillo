@@ -9,7 +9,6 @@ import rusty.vanillo.registry.VItems;
 import rusty.vanillo.registry.VRecipeSerializers;
 
 public class RecyclingRecipe extends AbstractCookingRecipe {
-
     public RecyclingRecipe(ResourceLocation id, String group, Ingredient input, ItemStack result, float exp, int duration) {
         super(VRecipeTypes.RECYCLING, id, group, input, result, exp, duration);
     }

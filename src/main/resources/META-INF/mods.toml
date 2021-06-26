@@ -7,7 +7,7 @@ modId="vanillo"
 version="${file.jarVersion}"
 displayName="Vanillo"
 credits="The exaggerated swagger of the Rusty Team"
-authors="TheDarkColour, cfrishausen, DJRoundTable"
+authors="TheDarkColour, cfrishausen, DJRoundTable, bobertrd"
 description='''
 Adds a few Vanilla-esque features and tweaks
 '''

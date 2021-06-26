@@ -13,8 +13,8 @@ apply plugin: 'eclipse'
 apply plugin: 'maven-publish'
 
 version = '1.0'
-group = 'com.yourname.modid' // http://maven.apache.org/guides/mini/guide-naming-conventions.html
-archivesBaseName = 'modid'
+group = 'rusty.vanillo' // http://maven.apache.org/guides/mini/guide-naming-conventions.html
+archivesBaseName = 'vanillo'
 
 java.toolchain.languageVersion = JavaLanguageVersion.of(8) // Mojang ships Java 8 to end users, so your mod should target Java 8.
 
@@ -107,7 +107,7 @@ repositories {
     maven {
         name = 'jei'
         url = 'https://dvs1.progwml6.com/files/maven/'
-        content {includeGroup "mezz.jei" }
+        content { includeGroup "mezz.jei" }
     }
 }
 
@@ -115,8 +115,8 @@ dependencies {
     minecraft 'net.minecraftforge:forge:1.16.5-36.1.25'
 
     // jei
-    compileOnly fg.deobf('mezz.jei:jei-1.16.4:7.7.0.106:api')
-    runtimeOnly fg.deobf('mezz.jei:jei-1.16.4:7.7.0.106')
+    compileOnly fg.deobf('mezz.jei:jei-1.16.5:7.7.0.106:api')
+    runtimeOnly fg.deobf('mezz.jei:jei-1.16.5:7.7.0.106')
 }
 
 // Example for how to get properties into the manifest for reading by the runtime..
@@ -136,7 +136,7 @@ jar {
 
 // Example configuration to allow publishing using the maven-publish task
 // This is the preferred method to reobfuscate your jar file
-jar.finalizedBy('reobfJar') 
+jar.finalizedBy('reobfJar')
 // However if you are in a multi-project build, dev time needs unobfed jar files, so you can delay the obfuscation until publishing by doing
 //publish.dependsOn('reobfJar')
 

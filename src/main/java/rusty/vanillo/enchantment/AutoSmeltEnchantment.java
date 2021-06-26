@@ -4,6 +4,8 @@ import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentType;
 import net.minecraft.enchantment.Enchantments;
 import net.minecraft.inventory.EquipmentSlotType;
+import net.minecraft.loot.LootTable;
+import net.minecraftforge.event.LootTableLoadEvent;
 
 public final class AutoSmeltEnchantment extends Enchantment {
     public AutoSmeltEnchantment() {
@@ -24,5 +26,13 @@ public final class AutoSmeltEnchantment extends Enchantment {
 
     public boolean checkCompatibility(Enchantment enchantment) {
         return super.checkCompatibility(enchantment) && enchantment != Enchantments.BLOCK_FORTUNE && enchantment != Enchantments.SILK_TOUCH;
+    }
+
+    public static void modifyLoot(LootTableLoadEvent event) {
+        LootTable table = event.getTable();
+
+        //if (table.getParamSet() == LootParameterSets.BLOCK) {
+            //table.
+       // }
     }
 }

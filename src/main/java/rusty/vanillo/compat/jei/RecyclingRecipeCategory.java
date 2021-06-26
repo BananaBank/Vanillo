@@ -5,7 +5,6 @@ import mezz.jei.api.constants.VanillaTypes;
 import mezz.jei.api.gui.IRecipeLayout;
 import mezz.jei.api.gui.drawable.IDrawable;
 import mezz.jei.api.gui.drawable.IDrawableAnimated;
-import mezz.jei.api.gui.drawable.IDrawableStatic;
 import mezz.jei.api.gui.ingredient.IGuiItemStackGroup;
 import mezz.jei.api.helpers.IGuiHelper;
 import mezz.jei.api.ingredients.IIngredients;
@@ -16,33 +15,30 @@ import net.minecraft.client.resources.I18n;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import rusty.vanillo.Vanillo;
+import rusty.vanillo.client.screen.RecyclerScreen;
 import rusty.vanillo.recipe.RecyclingRecipe;
 import rusty.vanillo.registry.VBlocks;
 
 public class RecyclingRecipeCategory implements IRecipeCategory<RecyclingRecipe> {
     public static final ResourceLocation ID = new ResourceLocation(Vanillo.ID, "recycling");
     private static final String TITLE = "gui.vanillo.category.recycling";
-    private static final int inputSlot = 0;
-    private static final int fuelSlot = 1;
-    private static final int outputSlot = 2;
-    private final IDrawableStatic staticFlame;
     private final IDrawableAnimated animatedFlame;
     private final IDrawable background;
     private final IDrawable icon;
     private final IDrawable arrow;
 
     public RecyclingRecipeCategory(IGuiHelper helper) {
-        ResourceLocation texture = new ResourceLocation("jei", "textures/gui/gui_vanilla.png");
+        ResourceLocation texture = RecyclerScreen.TEXTURE;
 
-        staticFlame = helper.createDrawable(texture, 82, 114, 14, 14);
-        animatedFlame = helper.createAnimatedDrawable(this.staticFlame, 300, IDrawableAnimated.StartDirection.TOP, true);
+        // Make Flame
+        animatedFlame = helper.drawableBuilder(texture, 176, 0, 14, 14).buildAnimated(300, IDrawableAnimated.StartDirection.TOP, true);
+        // Make Background
+        background = helper.createDrawable(texture, 55, 16, 82, 54);
+        // Make Arrow
+        arrow = helper.drawableBuilder(texture, 176, 14, 25, 16).buildAnimated(200, IDrawableAnimated.StartDirection.LEFT, false);
 
-        background = helper.createDrawable(texture, 0, 114, 82, 54);
         icon = helper.createDrawableIngredient(new ItemStack(VBlocks.RECYCLER.get()));
-        arrow = helper.drawableBuilder(texture, 82, 128, 24, 17).buildAnimated(200, IDrawableAnimated.StartDirection.LEFT, false);
     }
-
-
 
     @Override
     public ResourceLocation getUid() {
@@ -73,7 +69,7 @@ public class RecyclingRecipeCategory implements IRecipeCategory<RecyclingRecipe>
     @Override
     public void draw(RecyclingRecipe recipe, MatrixStack stack, double mouseX, double mouseY) {
         animatedFlame.draw(stack, 1, 20);
-        arrow.draw(stack, 24, 18);
+        arrow.draw(stack, 25, 18);
         float experience = recipe.getExperience();
 
         if (experience > 0.0F) {

@@ -3,12 +3,17 @@ package rusty.vanillo.client;
 import net.minecraft.client.gui.ScreenManager;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.RenderTypeLookup;
+import net.minecraft.item.ItemModelsProperties;
+import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.event.GuiContainerEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import rusty.vanillo.client.screen.RecyclerScreen;
 import rusty.vanillo.registry.VBlocks;
 import rusty.vanillo.registry.VContainerTypes;
+import rusty.vanillo.registry.VItems;
+
+import java.awt.Color;
 
 /**
  * @author DJRoundTable, TheDarkColour
@@ -31,9 +36,15 @@ public final class ClientHandler {
             RenderTypeLookup.setRenderLayer(VBlocks.NETHERITE_POWERED_RAIL.get(), RenderType.cutout());
             RenderTypeLookup.setRenderLayer(VBlocks.VOID_POWERED_RAIL.get(), RenderType.cutout());
 
-            RenderTypeLookup.setRenderLayer(VBlocks.MYSTERY_CUBE.get(), RenderType.translucent());
 
 //            RenderTypeLookup.setRenderLayer(VBlocks.GRASS_SLAB.get(), RenderType.cutoutMipped());
+        });
+
+        ItemModelsProperties.register(VItems.VOID_BOW.get(), new ResourceLocation("pull"), (stack, level, living) -> {
+            return living == null ? 0.0f : (living.getUseItem() != stack ? 0.0f : (stack.getUseDuration() - living.getUseItemRemainingTicks()) / 20.0f);
+        });
+        ItemModelsProperties.register(VItems.VOID_BOW.get(), new ResourceLocation("pulling"), (stack, level, living) -> {
+            return living != null && living.isUsingItem() && living.getUseItem() == stack ? 1.0f : 0.0f;
         });
     }
 
@@ -56,4 +67,9 @@ public final class ClientHandler {
             return blockColors.getColor(blockstate, null, null, p_210235_2_);
         }, VBlocks.GRASS_SLAB.get());
     }*/
+
+    // Higher
+    public static Color getRainbowColor(long ticks, float partialTicks, float speedFactor) {
+        return Color.getHSBColor((float) ((180 * Math.sin((ticks + partialTicks) / speedFactor) - 180) / 360.0f), 1.0f, 0.5f);
+    }
 }

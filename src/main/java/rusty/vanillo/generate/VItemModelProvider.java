@@ -22,19 +22,22 @@ public class VItemModelProvider extends ItemModelProvider {
 
     @Override
     protected void registerModels() {
-        dirtModels();
-        voidToolsAndArmor();
-        railModels();
-        voidOreItemModels();
+        decorationBlocks();
+        voidGear();
+        rails();
+        remnantsOfRift();
+
+        // Recycler
+        generic3d(VItems.RECYCLER);
     }
 
-    private void voidOreItemModels() {
+    private void remnantsOfRift() {
         generic3d(VItems.VOID_BLOCK, VItems.VOID_ORE);
         generic2d(VItems.VOID_SHARD);
         generic2d(VItems.VOID_CRYSTAL);
     }
 
-    private void railModels() {
+    private void rails() {
         generic2d(VItems.WOODEN_RAIL);
         generic2d(VItems.GLOWSTONE_RAIL);
         generic2d(VItems.DIAMOND_POWERED_RAIL);
@@ -42,7 +45,7 @@ public class VItemModelProvider extends ItemModelProvider {
         generic2d(VItems.VOID_POWERED_RAIL);
     }
 
-    private void dirtModels() {
+    private void decorationBlocks() {
         // Creates dirt slab models that only take one line defining the parent.
         generic3d(VBlocks.DIRT_SLAB);
         generic3d(VBlocks.COARSE_DIRT_SLAB);
@@ -59,7 +62,7 @@ public class VItemModelProvider extends ItemModelProvider {
 
     }
 
-    private void voidToolsAndArmor(){
+    private void voidGear(){
         // Tools
         toolModels(VItems.VOID_AXE);
         toolModels(VItems.VOID_PICKAXE);

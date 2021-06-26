@@ -12,10 +12,14 @@ import net.minecraft.item.ItemStack;
 
 // Called from the core mods
 public final class GlintHooks {
-    // todo add to BipedArmorLayer
+    public static final ThreadLocal<ItemStack> ARMOR_CONTEXT = ThreadLocal.withInitial(() -> ItemStack.EMPTY);
+
+    public static IVertexBuilder aaa(IRenderTypeBuffer p_239386_0_, RenderType p_239386_1_, boolean p_239386_2_, boolean p_239386_3_) {
+        return getArmorFoilBuffer(p_239386_0_, p_239386_1_, p_239386_2_, p_239386_3_);
+    }
+
     public static IVertexBuilder getArmorFoilBuffer(IRenderTypeBuffer buffer, RenderType layer, boolean regularType, boolean p_239386_3_) {
-        // todo get ItemStack context
-        return p_239386_3_ ? VertexBuilderUtils.create(buffer.getBuffer(ColoredGlints.getArmorGlint(null, regularType)), buffer.getBuffer(layer)) : buffer.getBuffer(layer);
+        return p_239386_3_ ? VertexBuilderUtils.create(buffer.getBuffer(ColoredGlints.getArmorGlint(ARMOR_CONTEXT.get(), regularType)), buffer.getBuffer(layer)) : buffer.getBuffer(layer);
     }
 
     public static IVertexBuilder getElytraFoil(ItemStack stack, IRenderTypeBuffer buffer, RenderType layer, boolean regularType, boolean p_239386_3_) {
@@ -24,7 +28,6 @@ public final class GlintHooks {
 
     public static IVertexBuilder getFoilBuffer(ItemStack stack, IRenderTypeBuffer p_229113_0_, RenderType p_229113_1_, boolean p_229113_2_, boolean p_229113_3_) {
         if (p_229113_3_) {
-            // PATCH
             return VertexBuilderUtils.create(p_229113_0_.getBuffer(ColoredGlints.getItemGlint(stack, Minecraft.useShaderTransparency() && p_229113_1_ == Atlases.translucentItemSheet(), p_229113_2_)), p_229113_0_.getBuffer(p_229113_1_));
         } else {
             return p_229113_0_.getBuffer(p_229113_1_);

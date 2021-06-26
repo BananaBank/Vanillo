@@ -5,7 +5,10 @@ import net.minecraft.block.BlockState;
 import net.minecraft.block.HorizontalBlock;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
+import net.minecraft.inventory.IInventory;
+import net.minecraft.inventory.InventoryHelper;
 import net.minecraft.inventory.container.INamedContainerProvider;
+import net.minecraft.item.BlockItemUseContext;
 import net.minecraft.state.StateContainer;
 import net.minecraft.state.properties.BlockStateProperties;
 import net.minecraft.tileentity.TileEntity;
@@ -22,6 +25,7 @@ import net.minecraftforge.fml.network.NetworkHooks;
 import rusty.vanillo.registry.VSoundEvents;
 import rusty.vanillo.tileentity.RecyclerTileEntity;
 
+import javax.annotation.Nullable;
 import java.util.Random;
 
 public class RecyclerBlock extends HorizontalBlock {
@@ -47,14 +51,20 @@ public class RecyclerBlock extends HorizontalBlock {
     }
 
     @Override
-    public ActionResultType use(BlockState state, World world, BlockPos pos, PlayerEntity playerIn, Hand hand, BlockRayTraceResult result) {
-        if (!world.isClientSide) {
-            TileEntity tileEntity = world.getBlockEntity(pos);
+    public ActionResultType use(BlockState state, World level, BlockPos pos, PlayerEntity playerIn, Hand hand, BlockRayTraceResult result) {
+        if (!level.isClientSide) {
+            TileEntity tileEntity = level.getBlockEntity(pos);
             if (tileEntity instanceof INamedContainerProvider) {
                 NetworkHooks.openGui((ServerPlayerEntity) playerIn, (INamedContainerProvider) tileEntity, tileEntity.getBlockPos());
             }
         }
-        return super.use(state, world, pos, playerIn, hand, result);
+        return ActionResultType.sidedSuccess(level.isClientSide);
+    }
+
+    @Nullable
+    @Override
+    public BlockState getStateForPlacement(BlockItemUseContext p_196258_1_) {
+        return this.defaultBlockState().setValue(FACING, p_196258_1_.getHorizontalDirection().getOpposite());
     }
 
     @Override
@@ -76,5 +86,20 @@ public class RecyclerBlock extends HorizontalBlock {
         double z = pos.getZ() + 0.5;
 
         level.playSound(null, x, y, z, VSoundEvents.RECYCLER.get(), SoundCategory.BLOCKS, 1.0f, 1.0f);
+    }
+
+    // From ChestBlock
+    @Override
+    public void onRemove(BlockState oldState, World level, BlockPos pos, BlockState newState, boolean p_196243_5_) {
+        if (!oldState.is(newState.getBlock())) {
+            TileEntity te = level.getBlockEntity(pos);
+
+            if (te instanceof IInventory) {
+                InventoryHelper.dropContents(level, pos, (IInventory) te);
+                level.updateNeighbourForOutputSignal(pos, this);
+            }
+
+            super.onRemove(oldState, level, pos, newState, p_196243_5_);
+        }
     }
 }

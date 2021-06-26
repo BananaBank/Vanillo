@@ -2,18 +2,29 @@ package rusty.vanillo;
 
 import net.minecraft.item.Item;
 import net.minecraft.item.Items;
+import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.IEventBus;
+import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import rusty.vanillo.client.ClientHandler;
 import rusty.vanillo.command.GlintCommand;
 import rusty.vanillo.feature.VFeatures;
+import rusty.vanillo.item.VoidBowItem;
 import rusty.vanillo.recipe.ColoredGlintAnvilRecipe;
-import rusty.vanillo.registry.*;
+import rusty.vanillo.registry.VBlocks;
+import rusty.vanillo.registry.VContainerTypes;
+import rusty.vanillo.registry.VEnchantments;
+import rusty.vanillo.registry.VItems;
+import rusty.vanillo.registry.VPointOfInterestTypes;
+import rusty.vanillo.registry.VRecipeSerializers;
+import rusty.vanillo.registry.VSoundEvents;
+import rusty.vanillo.registry.VTileEntities;
+import rusty.vanillo.registry.VVillagerProfessions;
 
 /**
  * @author TheDarkColour, cfrishausen, DJRoundTable
@@ -33,6 +44,8 @@ public final class Vanillo {
         forgeEventBus.addListener(ColoredGlintAnvilRecipe::onAnvilUpdate);
         forgeEventBus.addListener(VVillagerProfessions::addTrades);
         forgeEventBus.addListener(VFeatures::onBiomeLoad);
+        forgeEventBus.addListener(VoidBowItem::damageEvent);
+        forgeEventBus.addListener(VoidBowItem::cleanupEntities);
 
         // Registry classes
         VBlocks.BLOCKS.register(modEventBus);
@@ -45,7 +58,7 @@ public final class Vanillo {
         VContainerTypes.CONTAINERS.register(modEventBus);
         VRecipeSerializers.SERIALIZERS.register(modEventBus);
 
-        ClientHandler.registerEvents();
+        DistExecutor.safeRunWhenOn(Dist.CLIENT, () -> ClientHandler::registerEvents);
     }
 
     public void onRegisterCommands(RegisterCommandsEvent event) {
