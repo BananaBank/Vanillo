@@ -41,7 +41,7 @@ public class RecyclerScreen extends ContainerScreen<RecyclerContainer> {
         }
 
         // Draws the gears
-        int progress = (int) ((((double) this.menu.getBurnProgress()) / 24.0) * 25); // Gets a remaining fuel as a ratio * 24 todo make this a ratio * 25
+        int progress = (int) ((((double) this.menu.getBurnProgress()) / 24.0) * 25); // Gets a remaining fuel as a ratio * 24
         this.blit(stack, guiLeft + 80, guiTop + 34, 176, 14, progress + 1, 16);
     }
 
