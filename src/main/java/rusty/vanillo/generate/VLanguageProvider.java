@@ -66,7 +66,7 @@ public class VLanguageProvider extends LanguageProvider {
         //addEnchantment(VEnchantments.AUTO_SMELT, "Auto Smelt");
         addEnchantment(VEnchantments.BANISHMENT, "Banishment", "Finishes off wounded targets");
         addEnchantment(VEnchantments.ABYSSAL_IMPULSE, "Abyssal Impulse", "Has a chance to debuff targets");
-        //addEnchantment(VEnchantments.PUNISHER, "Punisher");
+        addEnchantment(VEnchantments.PUNISHER, "Punisher", "Deals more damage to targets at full health");
 
         // Recycler
         addItem(VItems.RECYCLER, "Recycler");

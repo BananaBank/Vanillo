@@ -18,5 +18,4 @@ public class AbyssalImpulseEnchantment extends Enchantment {
     public int getMaxLevel() {
         return 1;
     }
-
 }

@@ -273,6 +273,11 @@ public class VRecipeProvider extends RecipeProvider {
         recycling(consumer, Items.BOOKSHELF, new ItemStack(Items.BOOK, 2), 0.15f, 150);
 
         // Block Recycling Recipes
+        recycling(consumer,
+                Ingredient.of(Items.WHITE_BED, Items.BLACK_BED, Items.GRAY_BED, Items.LIGHT_GRAY_BED, Items.BROWN_BED, Items.RED_BED, Items.ORANGE_BED, Items.YELLOW_BED, Items.LIME_BED, Items.GREEN_BED, Items.LIGHT_BLUE_BED, Items.CYAN_BED, Items.BLUE_BED, Items.PURPLE_BED, Items.MAGENTA_BED, Items.PINK_BED),
+                new ItemStack(Items.WHITE_WOOL, 2),
+                0.15f,
+                125);
         recycling(consumer, Items.PISTON, Items.IRON_INGOT, 0.35f, 200); // Add Planks, Cobblestone, redstone to loot table
         recycling(consumer, Items.STICKY_PISTON, Items.SLIME_BALL, 0.35f, 200); // Add Iron, Planks, Cobblestone, redstone to loot table
         recycling(consumer, Items.LADDER, new ItemStack(Items.STICK, 5), 0.1f, 100);
@@ -374,14 +379,14 @@ public class VRecipeProvider extends RecipeProvider {
 
         recycling(consumer,
                 Ingredient.of(Items.NETHERITE_HELMET, Items.NETHERITE_CHESTPLATE, Items.NETHERITE_LEGGINGS, Items.NETHERITE_BOOTS),
-                new ItemStack(Items.NETHERITE_SCRAP, 11),
+                new ItemStack(Items.NETHERITE_SCRAP, 3),
                 1.0f,
                 800,
                 "_armor");
 
         recycling(consumer,
                 Ingredient.of(VItems.VOID_HELMET.get(), VItems.VOID_CHESTPLATE.get() , VItems.VOID_LEGGINGS.get(), VItems.VOID_BOOTS.get()),
-                new ItemStack(VItems.VOID_CRYSTAL.get(), 11),
+                new ItemStack(VItems.VOID_CRYSTAL.get(), 3),
                 1.0f,
                 800,
                 "_armor");

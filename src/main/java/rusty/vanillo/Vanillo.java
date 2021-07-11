@@ -10,11 +10,14 @@ import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import rusty.vanillo.client.ClientHandler;
 import rusty.vanillo.command.GlintCommand;
+import rusty.vanillo.feature.VConfiguredFeatures;
 import rusty.vanillo.feature.VFeatures;
 import rusty.vanillo.item.VoidBowItem;
+import rusty.vanillo.item.VoidSwordItem;
 import rusty.vanillo.recipe.ColoredGlintAnvilRecipe;
 import rusty.vanillo.registry.VBlocks;
 import rusty.vanillo.registry.VContainerTypes;
@@ -39,6 +42,7 @@ public final class Vanillo {
 
         // LOWEST priority; fires after every other mod
         modEventBus.addGenericListener(Item.class, EventPriority.LOWEST, this::onItemRegistry);
+        modEventBus.addListener(this::onCommonSetup);
 
         forgeEventBus.addListener(this::onRegisterCommands);
         forgeEventBus.addListener(ColoredGlintAnvilRecipe::onAnvilUpdate);
@@ -46,6 +50,7 @@ public final class Vanillo {
         forgeEventBus.addListener(VFeatures::onBiomeLoad);
         forgeEventBus.addListener(VoidBowItem::damageEvent);
         forgeEventBus.addListener(VoidBowItem::cleanupEntities);
+        forgeEventBus.addListener(VoidSwordItem::punish);
 
         // Registry classes
         VBlocks.BLOCKS.register(modEventBus);
@@ -63,6 +68,10 @@ public final class Vanillo {
 
     public void onRegisterCommands(RegisterCommandsEvent event) {
         GlintCommand.register(event.getDispatcher());
+    }
+
+    public void onCommonSetup(FMLCommonSetupEvent event) {
+        VConfiguredFeatures.registerConfiguredFeatures();
     }
 
     // Called after all other items are registered

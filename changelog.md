@@ -1,5 +1,14 @@
 ##Vanillo 1.1
-- TODO Add Quark glint compat fixes
+- Added new Punisher Enchantment
+- Fixed Zombie Villager Conductor textures
+- Added more recycler recipes
+- Fixed Remnants of the Rift generation
+- Enchantments compatible with Enchantment Descriptions
+
+##Vanillo 1.01
+- Added Animated Texture for the recycler top
+- Fixed Netherite and Void armor exploits with Recycler Block
+- Vanillo can now also run on versions 1.16.3 and 1.16.4
 
 ##Vanillo 1.0
 - Added Recycler Block

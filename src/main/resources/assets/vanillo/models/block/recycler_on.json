@@ -1,7 +1,7 @@
 {
   "parent": "minecraft:block/orientable",
   "textures": {
-    "top": "vanillo:block/recycler_top_b",
+    "top": "vanillo:block/recycler_top_on",
     "front": "vanillo:block/recycler_front_on_b3",
     "side": "vanillo:block/recycler_side_b",
     "back": "vanillo:block/recycler_back_b",

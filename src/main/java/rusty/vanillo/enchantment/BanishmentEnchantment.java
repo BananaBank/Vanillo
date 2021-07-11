@@ -18,5 +18,4 @@ public class BanishmentEnchantment extends Enchantment {
     public int getMaxLevel() {
         return 3;
     }
-
 }

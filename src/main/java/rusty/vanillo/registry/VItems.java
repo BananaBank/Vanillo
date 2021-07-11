@@ -11,7 +11,6 @@ import net.minecraft.item.Item;
 import net.minecraft.item.PickaxeItem;
 import net.minecraft.item.Rarity;
 import net.minecraft.item.ShovelItem;
-import net.minecraft.item.SwordItem;
 import net.minecraftforge.fml.RegistryObject;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
@@ -20,6 +19,7 @@ import rusty.vanillo.item.VTab;
 import rusty.vanillo.item.VoidArmorMaterial;
 import rusty.vanillo.item.VoidBowItem;
 import rusty.vanillo.item.VoidItemTier;
+import rusty.vanillo.item.VoidSwordItem;
 import rusty.vanillo.item.WoodenRailItem;
 
 import java.util.function.Function;
@@ -64,7 +64,7 @@ public final class VItems {
     public static final RegistryObject<Item> VOID_CHESTPLATE = registerVoidArmorItem("void_chestplate", EquipmentSlotType.CHEST);
     public static final RegistryObject<Item> VOID_HELMET = registerVoidArmorItem("void_helmet", EquipmentSlotType.HEAD);
     public static final RegistryObject<Item> VOID_BOW = ITEMS.register("void_bow", () -> new VoidBowItem(new Item.Properties().fireResistant().defaultDurability(1569).rarity(Rarity.RARE).tab(VTab.INSTANCE)));
-    public static final RegistryObject<Item> VOID_SWORD = ITEMS.register("void_sword", () -> new SwordItem(VoidItemTier.INSTANCE, 3, -2.4F, (new Item.Properties()).fireResistant().rarity(Rarity.RARE).tab(VTab.INSTANCE)));
+    public static final RegistryObject<Item> VOID_SWORD = ITEMS.register("void_sword", () -> new VoidSwordItem(VoidItemTier.INSTANCE, 3, -2.4F, (new Item.Properties()).fireResistant().rarity(Rarity.RARE).tab(VTab.INSTANCE)));
     public static final RegistryObject<Item> VOID_SHOVEL = ITEMS.register("void_shovel", () -> new ShovelItem(VoidItemTier.INSTANCE, 1.5F, -3.0F, (new Item.Properties()).fireResistant().rarity(Rarity.RARE).tab(VTab.INSTANCE)));
     public static final RegistryObject<Item> VOID_PICKAXE = ITEMS.register("void_pickaxe", () -> new PickaxeItem(VoidItemTier.INSTANCE, 1, -2.8F, (new Item.Properties()).fireResistant().rarity(Rarity.RARE).tab(VTab.INSTANCE)));
     public static final RegistryObject<Item> VOID_AXE = ITEMS.register("void_axe", () -> new AxeItem(VoidItemTier.INSTANCE, 5.0F, -3.0F, (new Item.Properties()).fireResistant().rarity(Rarity.RARE).tab(VTab.INSTANCE)));

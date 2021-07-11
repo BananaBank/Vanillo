@@ -1,12 +1,11 @@
 package rusty.vanillo.enchantment;
 
 import net.minecraft.enchantment.Enchantment;
-import net.minecraft.enchantment.EnchantmentType;
 import net.minecraft.inventory.EquipmentSlotType;
 
 public class PunisherEnchantment extends Enchantment {
     public PunisherEnchantment() {
-        super(Enchantment.Rarity.VERY_RARE, EnchantmentType.WEAPON, new EquipmentSlotType[] { EquipmentSlotType.MAINHAND});
+        super(Enchantment.Rarity.VERY_RARE, VEnchantmentTypes.VOID_SWORD, new EquipmentSlotType[] { EquipmentSlotType.MAINHAND});
     }
     public int getMinCost(int p_77321_1_) {
         return 15;

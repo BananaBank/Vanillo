@@ -25,3 +25,7 @@ run
 forge*changelog.txt
 /src/main/java/net/minecraft/
 /src/generated/
+/TEMPLATE TEXTURES/
+/.flooignore
+/.floo
+/.gitattributes
