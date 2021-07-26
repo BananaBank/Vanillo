@@ -1,10 +1,10 @@
 package rusty.vanillo.item;
 
-import net.minecraft.inventory.EquipmentSlotType;
-import net.minecraft.item.IArmorMaterial;
-import net.minecraft.item.crafting.Ingredient;
-import net.minecraft.util.SoundEvent;
-import net.minecraft.util.SoundEvents;
+import net.minecraft.sounds.SoundEvent;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.item.ArmorMaterial;
+import net.minecraft.world.item.crafting.Ingredient;
 import rusty.vanillo.Vanillo;
 
 /**
@@ -17,7 +17,7 @@ import rusty.vanillo.Vanillo;
  *
  * @author TheDarkColour
  */
-public enum VoidArmorMaterial implements IArmorMaterial {
+public enum VoidArmorMaterial implements ArmorMaterial {
     INSTANCE; // Single enum value that acts as the only instance of this class (singleton)
 
     // Durability for Boots, Leggings, Chestplate, and Helmet in that order
@@ -26,12 +26,12 @@ public enum VoidArmorMaterial implements IArmorMaterial {
     private static final int[] PROTECTION = new int[]{3, 6, 8, 3};
 
     @Override
-    public int getDurabilityForSlot(EquipmentSlotType slotType) {
+    public int getDurabilityForSlot(EquipmentSlot slotType) {
         return DURABILITY[slotType.getIndex()];
     }
 
     @Override
-    public int getDefenseForSlot(EquipmentSlotType slotType) {
+    public int getDefenseForSlot(EquipmentSlot slotType) {
         return PROTECTION[slotType.getIndex()];
     }
 

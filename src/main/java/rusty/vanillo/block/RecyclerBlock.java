@@ -1,34 +1,38 @@
 package rusty.vanillo.block;
 
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.HorizontalBlock;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.inventory.IInventory;
-import net.minecraft.inventory.InventoryHelper;
-import net.minecraft.inventory.container.INamedContainerProvider;
-import net.minecraft.item.BlockItemUseContext;
-import net.minecraft.state.StateContainer;
-import net.minecraft.state.properties.BlockStateProperties;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.ActionResultType;
-import net.minecraft.util.Direction;
-import net.minecraft.util.Hand;
-import net.minecraft.util.SoundCategory;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.BlockRayTraceResult;
-import net.minecraft.world.IBlockReader;
-import net.minecraft.world.World;
-import net.minecraft.world.server.ServerWorld;
-import net.minecraftforge.fml.network.NetworkHooks;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.Container;
+import net.minecraft.world.Containers;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.MenuProvider;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.context.BlockPlaceContext;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.EntityBlock;
+import net.minecraft.world.level.block.HorizontalDirectionalBlock;
+import net.minecraft.world.level.block.entity.AbstractFurnaceBlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityTicker;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.StateDefinition;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraftforge.fmllegacy.network.NetworkHooks;
+import rusty.vanillo.registry.VBlockEntities;
 import rusty.vanillo.registry.VSoundEvents;
-import rusty.vanillo.tileentity.RecyclerTileEntity;
+import rusty.vanillo.tileentity.RecyclerBlockEntity;
 
 import javax.annotation.Nullable;
 import java.util.Random;
 
-public class RecyclerBlock extends HorizontalBlock {
+public class RecyclerBlock extends HorizontalDirectionalBlock implements EntityBlock {
     public RecyclerBlock(Properties properties) {
         super(properties);
 
@@ -36,66 +40,65 @@ public class RecyclerBlock extends HorizontalBlock {
     }
 
     @Override
-    protected void createBlockStateDefinition(StateContainer.Builder<Block, BlockState> builder) {
+    protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
         builder.add(BlockStateProperties.LIT, FACING);
-    }
-
-    @Override
-    public RecyclerTileEntity createTileEntity(BlockState state, IBlockReader world) {
-        return new RecyclerTileEntity();
-    }
-
-    @Override
-    public boolean hasTileEntity(BlockState state) {
-        return true;
-    }
-
-    @Override
-    public ActionResultType use(BlockState state, World level, BlockPos pos, PlayerEntity playerIn, Hand hand, BlockRayTraceResult result) {
-        if (!level.isClientSide) {
-            TileEntity tileEntity = level.getBlockEntity(pos);
-            if (tileEntity instanceof INamedContainerProvider) {
-                NetworkHooks.openGui((ServerPlayerEntity) playerIn, (INamedContainerProvider) tileEntity, tileEntity.getBlockPos());
-            }
-        }
-        return ActionResultType.sidedSuccess(level.isClientSide);
     }
 
     @Nullable
     @Override
-    public BlockState getStateForPlacement(BlockItemUseContext p_196258_1_) {
-        return this.defaultBlockState().setValue(FACING, p_196258_1_.getHorizontalDirection().getOpposite());
+    public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level level, BlockState state, BlockEntityType<T> type) {
+        if (level.isClientSide) {
+            return createTickerHelper(type, VBlockEntities.RECYCLER_ENTITY.get(), RecyclerBlockEntity::tick);
+        } else {
+            return createTickerHelper(type, VBlockEntities.RECYCLER_ENTITY.get(), AbstractFurnaceBlockEntity::serverTick);
+        }
+    }
+
+    @Nullable
+    private static <E extends BlockEntity, A extends BlockEntity> BlockEntityTicker<A> createTickerHelper(BlockEntityType<A> type, BlockEntityType<E> expected, BlockEntityTicker<? super E> ticker) {
+        return expected == type ? (BlockEntityTicker<A>) ticker : null;
+    }
+
+    @Nullable
+    @Override
+    public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
+        return new RecyclerBlockEntity(pos, state);
     }
 
     @Override
-    public void animateTick(BlockState state, World level, BlockPos pos, Random rand) {
-        /*if (state.getValue(BlockStateProperties.LIT)) {
-            double d0 = pos.getX() + 0.5;
-            double d1 = pos.getY();
-            double d2 = pos.getZ() + 0.5;
-            if (rand.nextDouble() < 0.1D) {
-                level.playLocalSound(d0, d1, d2, VSoundEvents.RECYCLER.get(), SoundCategory.BLOCKS, 1.0F, 1.0F, false);
+    public InteractionResult use(BlockState state, Level level, BlockPos pos, Player playerIn, InteractionHand hand, BlockHitResult result) {
+        if (!level.isClientSide) {
+            BlockEntity tileEntity = level.getBlockEntity(pos);
+            if (tileEntity instanceof MenuProvider) {
+                NetworkHooks.openGui((ServerPlayer) playerIn, (MenuProvider) tileEntity, tileEntity.getBlockPos());
             }
-        }*/
+        }
+        return InteractionResult.sidedSuccess(level.isClientSide);
+    }
+
+    @Nullable
+    @Override
+    public BlockState getStateForPlacement(BlockPlaceContext context) {
+        return this.defaultBlockState().setValue(FACING, context.getHorizontalDirection().getOpposite());
     }
 
     @Override
-    public void tick(BlockState p_225534_1_, ServerWorld level, BlockPos pos, Random p_225534_4_) {
+    public void tick(BlockState p_225534_1_, ServerLevel level, BlockPos pos, Random p_225534_4_) {
         double x = pos.getX() + 0.5;
         double y = pos.getY() + 0.5;
         double z = pos.getZ() + 0.5;
 
-        level.playSound(null, x, y, z, VSoundEvents.RECYCLER.get(), SoundCategory.BLOCKS, 1.0f, 1.0f);
+        level.playSound(null, x, y, z, VSoundEvents.RECYCLER.get(), SoundSource.BLOCKS, 1.0f, 1.0f);
     }
 
     // From ChestBlock
     @Override
-    public void onRemove(BlockState oldState, World level, BlockPos pos, BlockState newState, boolean p_196243_5_) {
+    public void onRemove(BlockState oldState, Level level, BlockPos pos, BlockState newState, boolean p_196243_5_) {
         if (!oldState.is(newState.getBlock())) {
-            TileEntity te = level.getBlockEntity(pos);
+            BlockEntity te = level.getBlockEntity(pos);
 
-            if (te instanceof IInventory) {
-                InventoryHelper.dropContents(level, pos, (IInventory) te);
+            if (te instanceof Container) {
+                Containers.dropContents(level, pos, (Container) te);
                 level.updateNeighbourForOutputSignal(pos, this);
             }
 

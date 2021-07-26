@@ -1,3 +1,4 @@
+/*
 package rusty.vanillo.compat.jei;
 
 import mezz.jei.api.IModPlugin;
@@ -8,8 +9,8 @@ import mezz.jei.api.registration.IGuiHandlerRegistration;
 import mezz.jei.api.registration.IRecipeCatalystRegistration;
 import mezz.jei.api.registration.IRecipeCategoryRegistration;
 import mezz.jei.api.registration.IRecipeRegistration;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.ItemStack;
 import rusty.vanillo.Vanillo;
 import rusty.vanillo.client.screen.RecyclerScreen;
 import rusty.vanillo.recipe.RecyclingRecipe;
@@ -53,3 +54,4 @@ public class VanilloJeiPlugin implements IModPlugin {
         registration.addRecipeCatalyst(recycler, VanillaRecipeCategoryUid.FUEL);
     }
 }
+*/

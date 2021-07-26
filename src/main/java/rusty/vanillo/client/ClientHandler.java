@@ -1,17 +1,16 @@
 package rusty.vanillo.client;
 
-import net.minecraft.client.gui.ScreenManager;
+import net.minecraft.client.gui.screens.MenuScreens;
+import net.minecraft.client.renderer.ItemBlockRenderTypes;
 import net.minecraft.client.renderer.RenderType;
-import net.minecraft.client.renderer.RenderTypeLookup;
-import net.minecraft.item.ItemModelsProperties;
-import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.client.event.GuiContainerEvent;
+import net.minecraft.client.renderer.item.ItemProperties;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import rusty.vanillo.client.screen.RecyclerScreen;
 import rusty.vanillo.registry.VBlocks;
-import rusty.vanillo.registry.VContainerTypes;
 import rusty.vanillo.registry.VItems;
+import rusty.vanillo.registry.VMenuTypes;
 
 import java.awt.Color;
 
@@ -27,46 +26,26 @@ public final class ClientHandler {
 
     private static void clientSetup(FMLClientSetupEvent event) {
         // register screen
-        ScreenManager.register(VContainerTypes.RECYCLER.get(), RecyclerScreen::new);
+        MenuScreens.register(VMenuTypes.RECYCLER.get(), RecyclerScreen::new);
 
         event.enqueueWork(() -> {
-            RenderTypeLookup.setRenderLayer(VBlocks.WOODEN_RAIL.get(), RenderType.cutout());
-            RenderTypeLookup.setRenderLayer(VBlocks.GLOWSTONE_RAIL.get(), RenderType.cutout());
-            RenderTypeLookup.setRenderLayer(VBlocks.DIAMOND_POWERED_RAIL.get(), RenderType.cutout());
-            RenderTypeLookup.setRenderLayer(VBlocks.NETHERITE_POWERED_RAIL.get(), RenderType.cutout());
-            RenderTypeLookup.setRenderLayer(VBlocks.VOID_POWERED_RAIL.get(), RenderType.cutout());
+            ItemBlockRenderTypes.setRenderLayer(VBlocks.WOODEN_RAIL.get(), RenderType.cutout());
+            ItemBlockRenderTypes.setRenderLayer(VBlocks.GLOWSTONE_RAIL.get(), RenderType.cutout());
+            ItemBlockRenderTypes.setRenderLayer(VBlocks.DIAMOND_POWERED_RAIL.get(), RenderType.cutout());
+            ItemBlockRenderTypes.setRenderLayer(VBlocks.NETHERITE_POWERED_RAIL.get(), RenderType.cutout());
+            ItemBlockRenderTypes.setRenderLayer(VBlocks.VOID_POWERED_RAIL.get(), RenderType.cutout());
 
 
 //            RenderTypeLookup.setRenderLayer(VBlocks.GRASS_SLAB.get(), RenderType.cutoutMipped());
         });
 
-        ItemModelsProperties.register(VItems.VOID_BOW.get(), new ResourceLocation("pull"), (stack, level, living) -> {
+        ItemProperties.register(VItems.VOID_BOW.get(), new ResourceLocation("pull"), (stack, level, living, i) -> {
             return living == null ? 0.0f : (living.getUseItem() != stack ? 0.0f : (stack.getUseDuration() - living.getUseItemRemainingTicks()) / 20.0f);
         });
-        ItemModelsProperties.register(VItems.VOID_BOW.get(), new ResourceLocation("pulling"), (stack, level, living) -> {
+        ItemProperties.register(VItems.VOID_BOW.get(), new ResourceLocation("pulling"), (stack, level, living, i) -> {
             return living != null && living.isUsingItem() && living.getUseItem() == stack ? 1.0f : 0.0f;
         });
     }
-
-    public static void overrideSmithingScreen(GuiContainerEvent.DrawBackground event) {
-
-    }
-
-    /*// Adds grass slab to blocks that have biome tint colors
-    private static void registerBlockColors(ColorHandlerEvent.Block event) {
-        event.getBlockColors().register((p_228064_0_, p_228064_1_, p_228064_2_, p_228064_3_) -> {
-            return p_228064_1_ != null && p_228064_2_ != null ? BiomeColors.getAverageGrassColor(p_228064_1_, p_228064_2_) : GrassColors.get(0.5D, 1.0D);
-        }, VBlocks.GRASS_SLAB.get());
-    }
-
-    // Adds the grass slab item block to tint colors
-    private static void registerItemColors(ColorHandlerEvent.Item event) {
-        BlockColors blockColors = event.getBlockColors();
-        event.getItemColors().register((stack, p_210235_2_) -> {
-            BlockState blockstate = ((BlockItem)stack.getItem()).getBlock().defaultBlockState();
-            return blockColors.getColor(blockstate, null, null, p_210235_2_);
-        }, VBlocks.GRASS_SLAB.get());
-    }*/
 
     // Higher
     public static Color getRainbowColor(long ticks, float partialTicks, float speedFactor) {

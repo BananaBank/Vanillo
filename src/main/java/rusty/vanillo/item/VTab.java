@@ -1,7 +1,7 @@
 package rusty.vanillo.item;
 
-import net.minecraft.item.ItemGroup;
-import net.minecraft.item.ItemStack;
+import net.minecraft.world.item.CreativeModeTab;
+import net.minecraft.world.item.ItemStack;
 import rusty.vanillo.Vanillo;
 import rusty.vanillo.registry.VItems;
 
@@ -11,7 +11,7 @@ import rusty.vanillo.registry.VItems;
  *
  * @author TheDarkColour
  */
-public final class VTab extends ItemGroup {
+public final class VTab extends CreativeModeTab {
     public static final VTab INSTANCE = new VTab(); // Singleton instance
 
     // Private constructor to ensure no other instances are created

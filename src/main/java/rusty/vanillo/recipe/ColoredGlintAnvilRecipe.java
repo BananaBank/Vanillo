@@ -2,15 +2,15 @@ package rusty.vanillo.recipe;
 
 import it.unimi.dsi.fastutil.objects.Object2ByteLinkedOpenHashMap;
 import it.unimi.dsi.fastutil.objects.Object2ByteMap;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.tags.ITag;
-import net.minecraft.util.Util;
+import net.minecraft.Util;
+import net.minecraft.tags.Tag;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.common.Tags;
 import net.minecraftforge.event.AnvilUpdateEvent;
 
 public class ColoredGlintAnvilRecipe {
-    private static final Object2ByteMap<ITag<Item>> TAG_COLOR_2_INDEX = Util.make(new Object2ByteLinkedOpenHashMap<>(), map -> {
+    private static final Object2ByteMap<Tag<Item>> TAG_COLOR_2_INDEX = Util.make(new Object2ByteLinkedOpenHashMap<>(), map -> {
         map.put(Tags.Items.DYES_WHITE, (byte) 0);
         map.put(Tags.Items.DYES_ORANGE, (byte) 1);
         map.put(Tags.Items.DYES_MAGENTA, (byte) 2);
@@ -38,10 +38,10 @@ public class ColoredGlintAnvilRecipe {
             return;
         }
 
-        if (left.hasFoil() && (right.getItem().is(Tags.Items.DYES) || right.getItem().is(Tags.Items.GEMS_DIAMOND))) {
+        if (left.hasFoil() && (right.is(Tags.Items.DYES) || right.is(Tags.Items.GEMS_DIAMOND))) {
             // todo replace with switch expression in 1.17
-            for (Object2ByteMap.Entry<ITag<Item>> tag : TAG_COLOR_2_INDEX.object2ByteEntrySet()) {
-                if (right.getItem().is(tag.getKey())) {
+            for (Object2ByteMap.Entry<Tag<Item>> tag : TAG_COLOR_2_INDEX.object2ByteEntrySet()) {
+                if (right.is(tag.getKey())) {
                     ItemStack result = left.copy();
                     result.getOrCreateTag().putByte("Glint", tag.getByteValue());
                     event.setOutput(result);

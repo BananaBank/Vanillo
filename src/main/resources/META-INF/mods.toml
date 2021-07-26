@@ -1,5 +1,5 @@
 modLoader="javafml"
-loaderVersion="[34,)"
+loaderVersion="[37,)"
 license="All rights reserved"
 
 [[mods]]
@@ -15,13 +15,13 @@ Adds a few Vanilla-esque features and tweaks
 [[dependencies.vanillo]]
 modId="forge"
 mandatory=true
-versionRange="[34,)"
+versionRange="[37,)"
 ordering="NONE"
 side="BOTH"
 
 [[dependencies.vanillo]]
 modId="minecraft"
 mandatory=true
-versionRange="[1.16.3,1.17)"
+versionRange="[1.17.1,1.18)"
 ordering="NONE"
 side="BOTH"

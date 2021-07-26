@@ -1,12 +1,12 @@
 package rusty.vanillo.generate;
 
 import net.minecraft.data.DataGenerator;
-import net.minecraft.item.Item;
-import net.minecraft.util.IItemProvider;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.level.ItemLike;
 import net.minecraftforge.client.model.generators.ItemModelProvider;
 import net.minecraftforge.client.model.generators.ModelFile;
 import net.minecraftforge.common.data.ExistingFileHelper;
-import net.minecraftforge.fml.RegistryObject;
+import net.minecraftforge.fmllegacy.RegistryObject;
 import net.minecraftforge.registries.IForgeRegistryEntry;
 import rusty.vanillo.Vanillo;
 import rusty.vanillo.registry.VBlocks;
@@ -78,20 +78,20 @@ public class VItemModelProvider extends ItemModelProvider {
     }
 
     @SafeVarargs
-    private final <T extends IItemProvider & IForgeRegistryEntry<T>> void generic3d(RegistryObject<T>... objects) {
-        for (RegistryObject<? extends IItemProvider> obj : objects) {
+    private final <T extends ItemLike & IForgeRegistryEntry<T>> void generic3d(RegistryObject<T>... objects) {
+        for (RegistryObject<? extends ItemLike> obj : objects) {
             generic3d(obj);
         }
     }
 
     // Generic 3d item model like anvil or a dirt block. Requires Block form.
-    private void generic3d(RegistryObject<? extends IItemProvider> supplier) {
+    private void generic3d(RegistryObject<? extends ItemLike> supplier) {
         String path = supplier.getId().getPath();
         withExistingParent(path, modLoc(BLOCK_FOLDER + "/" + path));
     }
 
     // Generic 2d item model like lantern or hopper. Requires Item form.
-    private void generic2d(RegistryObject<? extends IItemProvider> supplier) {
+    private void generic2d(RegistryObject<? extends ItemLike> supplier) {
         String path = supplier.getId().getPath();
         getBuilder(path).parent(new ModelFile.UncheckedModelFile(mcLoc("item/generated"))).texture("layer0", modLoc("item/" + path));
     }

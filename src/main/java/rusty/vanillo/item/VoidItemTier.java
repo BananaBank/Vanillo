@@ -1,23 +1,25 @@
 package rusty.vanillo.item;
 
-import net.minecraft.item.IItemTier;
-import net.minecraft.item.crafting.Ingredient;
-import net.minecraft.util.LazyValue;
+import com.google.common.base.Suppliers;
+import net.minecraft.world.item.Tier;
+import net.minecraft.world.item.crafting.Ingredient;
 import rusty.vanillo.registry.VItems;
+
+import java.util.function.Supplier;
 
 /**
  * Uses a similar singleton pattern like in {@link VoidArmorMaterial}.
  *
  * @author TheDarkColour
  */
-public enum VoidItemTier implements IItemTier {
+public enum VoidItemTier implements Tier {
     INSTANCE; // Singleton instance
 
     /**
      * Lazy values are loaded later so that the item is guaranteed to be registered by that time
      * This Lazy value contains the ingredient used to repair Void items in an Anvil
      */
-    public static final LazyValue<Ingredient> REPAIR_COST = new LazyValue(() -> Ingredient.of(VItems.VOID_SHARD.get()));
+    public static final Supplier<Ingredient> REPAIR_COST = Suppliers.memoize(() -> Ingredient.of(VItems.VOID_SHARD.get()));
 
     @Override
     public int getUses() {

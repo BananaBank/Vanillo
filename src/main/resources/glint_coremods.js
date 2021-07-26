@@ -13,25 +13,56 @@ var FieldInsnNode = Java.type('org.objectweb.asm.tree.FieldInsnNode');
 
 var ASMAPI = Java.type('net.minecraftforge.coremod.api.ASMAPI');
 
+// Type aliases
+var ItemRenderer_class = 'net.minecraft.client.renderer.entity.ItemRenderer';
+  var ItemRenderer_render = 'm_115143_';
+  var ItemRenderer_render_desc = '(Lnet/minecraft/world/item/ItemStack;Lnet/minecraft/client/renderer/block/model/ItemTransforms$TransformType;ZLcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/MultiBufferSource;IILnet/minecraft/client/resources/model/BakedModel;)V';
+
+  var ItemRenderer_getArmorFoilBuffer = 'm_115184_'
+  var ItemRenderer_getArmorFoilBuffer_desc = '(Lnet/minecraft/client/renderer/MultiBufferSource;Lnet/minecraft/client/renderer/RenderType;ZZ)Lcom/mojang/blaze3d/vertex/VertexConsumer;'
+
+  var ItemRenderer_getCompassFoilBuffer = 'm_115180_'
+  var ItemRenderer_getCompassFoilBufferDirect = 'm_115207_'
+  var ItemRenderer_getFoilBuffer = 'm_115211_'
+  var ItemRenderer_getFoilBufferDirect = 'm_115222_'
+
+var ItemStack_class = 'net/minecraft/world/item/ItemStack'
+
+var ElytraLayer_class = 'net.minecraft.client.renderer.entity.layers.ElytraLayer'
+  var ElytraLayer_render = 'm_6494_'
+  var ElytraLayer_render_desc = '(Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/MultiBufferSource;ILnet/minecraft/world/entity/LivingEntity;FFFFFF)V'
+
+var LevelRenderer_class = 'net.minecraft.client.renderer.LevelRenderer'
+  var LevelRenderer_render = 'm_109599_'
+  var LevelRenderer_render_desc = '(Lcom/mojang/blaze3d/vertex/PoseStack;FJZLnet/minecraft/client/Camera;Lnet/minecraft/client/renderer/GameRenderer;Lnet/minecraft/client/renderer/LightTexture;Lcom/mojang/math/Matrix4f;)V'
+
+// RenderType_class
+  var RenderType_armorGlint = 'm_110481_'
+
+var HumanoidArmorLayer_class = 'net.minecraft.client.renderer.entity.layers.HumanoidArmorLayer'
+  var HumanoidArmorLayer_renderArmorPiece = 'm_117118_'
+  var HumanoidArmorLayer_renderArmorPiece_desc = '(Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/MultiBufferSource;Lnet/minecraft/world/entity/LivingEntity;Lnet/minecraft/world/entity/EquipmentSlot;ILnet/minecraft/client/model/HumanoidModel;)V'
+
 function initializeCoreMod() {
     return {
         'ItemRendererPatch': {
             'target': {
                 'type': 'METHOD',
-                'class': 'net.minecraft.client.renderer.ItemRenderer',
-                'methodName': 'func_229111_a_', // render
-                'methodDesc': '(Lnet/minecraft/item/ItemStack;Lnet/minecraft/client/renderer/model/ItemCameraTransforms$TransformType;ZLcom/mojang/blaze3d/matrix/MatrixStack;Lnet/minecraft/client/renderer/IRenderTypeBuffer;IILnet/minecraft/client/renderer/model/IBakedModel;)V'
+                'class': ItemRenderer_class,
+                'methodName': ItemRenderer_render, // render
+                'methodDesc': ItemRenderer_render_desc
             },
             'transformer': function (method) {
                 var insnList = method.instructions; // method instructions
                 var toApply = []; // instruction list modifications
 
-                var getCompassFoilBuffer = ASMAPI.mapMethod('func_241731_a_');
-                var getCompassFoilBufferDirect = ASMAPI.mapMethod('func_241732_b_');
-                var getFoilBuffer = ASMAPI.mapMethod('func_229113_a_');
-                var getFoilBufferDirect = ASMAPI.mapMethod('func_239391_c_');
+                var getCompassFoilBuffer = ASMAPI.mapMethod(ItemRenderer_getCompassFoilBuffer); // getCompassFoilBuffer
+                var getCompassFoilBufferDirect = ASMAPI.mapMethod(ItemRenderer_getCompassFoilBufferDirect); // getCompassFoilBufferDirect
+                var getFoilBuffer = ASMAPI.mapMethod(ItemRenderer_getFoilBuffer); // getFoilBuffer
+                var getFoilBufferDirect = ASMAPI.mapMethod(ItemRenderer_getFoilBufferDirect); // getFoilBufferDirect
 
                 onInvokeStatic(insnList, function(insn) {
+                    // We don't have to change these, these are our names
                     if (insn.name.equals(getCompassFoilBuffer)) {
                         toApply.push(patchCompassFoil(insnList, insn, 'getCompassFoilBufferDirect'));
                     } else if (insn.name.equals(getCompassFoilBufferDirect)) {
@@ -45,7 +76,7 @@ function initializeCoreMod() {
 
                 // Apply instruction list modifications after the list has been iterated through
                 for (var i = 0; i < toApply.length; ++i) {
-                    ASMAPI.log('DEBUG', 'ItemRenderer Patch ' + i + ' successful');
+                    ASMAPI.log('DEBUG', 'ItemRenderer Patched ' + i + ' successful');
                     toApply[i]();
                 }
 
@@ -55,47 +86,47 @@ function initializeCoreMod() {
         'ItemRendererPatch2': {
             'target': {
                 'type': 'METHOD',
-                'class': 'net.minecraft.client.renderer.ItemRenderer',
-                'methodName': 'func_239386_a_', // getArmorFoilBuffer
-                'methodDesc': '(Lnet/minecraft/client/renderer/IRenderTypeBuffer;Lnet/minecraft/client/renderer/RenderType;ZZ)Lcom/mojang/blaze3d/vertex/IVertexBuilder;'
+                'class': ItemRenderer_class,
+                'methodName': ItemRenderer_getArmorFoilBuffer, // getArmorFoilBuffer
+                'methodDesc': ItemRenderer_getArmorFoilBuffer_desc
             },
             'transformer': function(method) {
                 method.instructions = ASMAPI.listOf();
 
                 var l0 = new Label();
-                mv.visitLabel(l0);
-                mv.visitLineNumber(22, l0);
-                mv.visitVarInsn(ILOAD, 3);
+                method.visitLabel(l0);
+                method.visitLineNumber(22, l0);
+                method.visitVarInsn(Opcodes.ILOAD, 3);
                 var l1 = new Label();
-                mv.visitJumpInsn(IFEQ, l1);
-                mv.visitVarInsn(ALOAD, 0);
-                mv.visitFieldInsn(GETSTATIC, "rusty/vanillo/client/glint/GlintHooks", "ARMOR_CONTEXT", "Ljava/lang/ThreadLocal;");
-                mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/ThreadLocal", "get", "()Ljava/lang/Object;", false);
-                mv.visitTypeInsn(CHECKCAST, "net/minecraft/item/ItemStack");
-                mv.visitVarInsn(ILOAD, 2);
-                mv.visitMethodInsn(INVOKESTATIC, "rusty/vanillo/client/glint/ColoredGlints", "getArmorGlint", "(Lnet/minecraft/item/ItemStack;Z)Lnet/minecraft/client/renderer/RenderType;", false);
-                mv.visitMethodInsn(INVOKEINTERFACE, "net/minecraft/client/renderer/IRenderTypeBuffer", "getBuffer", "(Lnet/minecraft/client/renderer/RenderType;)Lcom/mojang/blaze3d/vertex/IVertexBuilder;", true);
-                mv.visitVarInsn(ALOAD, 0);
-                mv.visitVarInsn(ALOAD, 1);
-                mv.visitMethodInsn(INVOKEINTERFACE, "net/minecraft/client/renderer/IRenderTypeBuffer", "getBuffer", "(Lnet/minecraft/client/renderer/RenderType;)Lcom/mojang/blaze3d/vertex/IVertexBuilder;", true);
-                mv.visitMethodInsn(INVOKESTATIC, "com/mojang/blaze3d/vertex/VertexBuilderUtils", "create", "(Lcom/mojang/blaze3d/vertex/IVertexBuilder;Lcom/mojang/blaze3d/vertex/IVertexBuilder;)Lcom/mojang/blaze3d/vertex/IVertexBuilder;", false);
+                method.visitJumpInsn(Opcodes.IFEQ, l1);
+                method.visitVarInsn(Opcodes.ALOAD, 0);
+                method.visitFieldInsn(Opcodes.GETSTATIC, "rusty/vanillo/client/glint/GlintHooks", "ARMOR_CONTEXT", "Ljava/lang/ThreadLocal;");
+                method.visitMethodInsn(Opcodes.INVOKEVIRTUAL, "java/lang/ThreadLocal", "get", "()Ljava/lang/Object;", false);
+                method.visitTypeInsn(Opcodes.CHECKCAST, ItemStack_class);
+                method.visitVarInsn(Opcodes.ILOAD, 2);
+                method.visitMethodInsn(Opcodes.INVOKESTATIC, "rusty/vanillo/client/glint/ColoredGlints", "getArmorGlint", "(Lnet/minecraft/world/item/ItemStack;Z)Lnet/minecraft/client/renderer/RenderType;", false);
+                method.visitMethodInsn(Opcodes.INVOKEINTERFACE, "net/minecraft/client/renderer/MultiBufferSource", "getBuffer", "(Lnet/minecraft/client/renderer/RenderType;)Lcom/mojang/blaze3d/vertex/VertexConsumer;", true);
+                method.visitVarInsn(Opcodes.ALOAD, 0);
+                method.visitVarInsn(Opcodes.ALOAD, 1);
+                method.visitMethodInsn(Opcodes.INVOKEINTERFACE, "net/minecraft/client/renderer/MultiBufferSource", "getBuffer", "(Lnet/minecraft/client/renderer/RenderType;)Lcom/mojang/blaze3d/vertex/VertexConsumer;", true);
+                method.visitMethodInsn(Opcodes.INVOKESTATIC, "com/mojang/blaze3d/vertex/VertexMultiConsumer", "create", "(Lcom/mojang/blaze3d/vertex/VertexConsumer;Lcom/mojang/blaze3d/vertex/VertexConsumer;)Lcom/mojang/blaze3d/vertex/VertexConsumer;", false);
                 var l2 = new Label();
-                mv.visitJumpInsn(GOTO, l2);
-                mv.visitLabel(l1);
-                mv.visitFrame(Opcodes.F_SAME, 0, null, 0, null);
-                mv.visitVarInsn(ALOAD, 0);
-                mv.visitVarInsn(ALOAD, 1);
-                mv.visitMethodInsn(INVOKEINTERFACE, "net/minecraft/client/renderer/IRenderTypeBuffer", "getBuffer", "(Lnet/minecraft/client/renderer/RenderType;)Lcom/mojang/blaze3d/vertex/IVertexBuilder;", true);
-                mv.visitLabel(l2);
-                mv.visitFrame(Opcodes.F_SAME1, 0, null, 1, new Object[]{"com/mojang/blaze3d/vertex/IVertexBuilder"});
-                mv.visitInsn(ARETURN);
+                method.visitJumpInsn(Opcodes.GOTO, l2);
+                method.visitLabel(l1);
+                method.visitFrame(Opcodes.F_SAME, 0, null, 0, null);
+                method.visitVarInsn(Opcodes.ALOAD, 0);
+                method.visitVarInsn(Opcodes.ALOAD, 1);
+                method.visitMethodInsn(Opcodes.INVOKEINTERFACE, "net/minecraft/client/renderer/MultiBufferSource", "getBuffer", "(Lnet/minecraft/client/renderer/RenderType;)Lcom/mojang/blaze3d/vertex/VertexConsumer;", true);
+                method.visitLabel(l2);
+                method.visitFrame(Opcodes.F_SAME1, 0, null, 1, ["com/mojang/blaze3d/vertex/VertexConsumer"]); //was new Object
+                method.visitInsn(Opcodes.ARETURN);
                 var l3 = new Label();
-                mv.visitLabel(l3);
-                mv.visitLocalVariable("buffer", "Lnet/minecraft/client/renderer/IRenderTypeBuffer;", null, l0, l3, 0);
-                mv.visitLocalVariable("layer", "Lnet/minecraft/client/renderer/RenderType;", null, l0, l3, 1);
-                mv.visitLocalVariable("regularType", "Z", null, l0, l3, 2);
-                mv.visitLocalVariable("p_239386_3_", "Z", null, l0, l3, 3);
-                mv.visitMaxs(3, 4);
+                method.visitLabel(l3);
+                method.visitLocalVariable("buffer", "Lnet/minecraft/client/renderer/MultiBufferSource;", null, l0, l3, 0);
+                method.visitLocalVariable("layer", "Lnet/minecraft/client/renderer/RenderType;", null, l0, l3, 1);
+                method.visitLocalVariable("regularType", "Z", null, l0, l3, 2);
+                method.visitLocalVariable("p_239386_3_", "Z", null, l0, l3, 3);
+                method.visitMaxs(3, 4);
 
                 return method;
             }
@@ -103,14 +134,14 @@ function initializeCoreMod() {
         'WorldRendererPatch': {
             'target': {
                 'type': 'METHOD',
-                'class': 'net.minecraft.client.renderer.WorldRenderer',
-                'methodName': 'func_228426_a_', // renderLevel
-                'methodDesc': '(Lcom/mojang/blaze3d/matrix/MatrixStack;FJZLnet/minecraft/client/renderer/ActiveRenderInfo;Lnet/minecraft/client/renderer/GameRenderer;Lnet/minecraft/client/renderer/LightTexture;Lnet/minecraft/util/math/vector/Matrix4f;)V'
+                'class': LevelRenderer_class,
+                'methodName': LevelRenderer_render, // renderLevel
+                'methodDesc': LevelRenderer_render_desc
             },
             'transformer': function(method) {
                 var insnList = method.instructions; // method instructions
                 var toApply = [];
-                var name = ASMAPI.mapMethod('func_239270_k_'); // armorGlint
+                var name = ASMAPI.mapMethod(RenderType_armorGlint); // armorGlint
 
                 onInvokeStatic(insnList, function(insn) {
                     if (insn.name.equals(name)) {
@@ -118,7 +149,7 @@ function initializeCoreMod() {
                         toApply.push(function() {
                             insnList.insertBefore(insn.getPrevious(), ASMAPI.listOf(
                                 new VarInsnNode(Opcodes.ALOAD, insn.getPrevious().var), // clone because some mods screw up the local variables
-                                new MethodInsnNode(Opcodes.INVOKESTATIC, "rusty/vanillo/client/glint/ColoredGlints", "endBatch", "(Lnet/minecraft/client/renderer/IRenderTypeBuffer$Impl;)V", false)
+                                new MethodInsnNode(Opcodes.INVOKESTATIC, "rusty/vanillo/client/glint/ColoredGlints", "endBatch", "(Lnet/minecraft/client/renderer/MultiBufferSource$BufferSource;)V", false)
                             ));
                         });
                     }
@@ -134,21 +165,21 @@ function initializeCoreMod() {
         'ElytraLayer': {
             'target': {
                 'type': 'METHOD',
-                'class': 'net.minecraft.client.renderer.entity.layers.ElytraLayer',
-                'methodName': 'func_225628_a_',
-                'methodDesc': '(Lcom/mojang/blaze3d/matrix/MatrixStack;Lnet/minecraft/client/renderer/IRenderTypeBuffer;ILnet/minecraft/entity/LivingEntity;FFFFFF)V'
+                'class': ElytraLayer_class,
+                'methodName': ElytraLayer_render, // render
+                'methodDesc': ElytraLayer_render_desc
             },
             'transformer': function (method) {
                 var insnList = method.instructions; // method instructions
 
                 onInvokeStatic(insnList, function(insn) {
                     // If we are at the correct method
-                    if (insn.desc.equals('(Lnet/minecraft/client/renderer/IRenderTypeBuffer;Lnet/minecraft/client/renderer/RenderType;ZZ)Lcom/mojang/blaze3d/vertex/IVertexBuilder;')) {
+                    if (insn.desc.equals('(Lnet/minecraft/client/renderer/MultiBufferSource;Lnet/minecraft/client/renderer/RenderType;ZZ)Lcom/mojang/blaze3d/vertex/VertexConsumer;')) {
                         // Load extra ItemStack variable for glint context
                         insnList.insertBefore(insn.getPrevious().getPrevious().getPrevious().getPrevious().getPrevious().getPrevious(), new VarInsnNode(Opcodes.ALOAD, 11));
 
                         // Change method node
-                        insn.desc = '(Lnet/minecraft/item/ItemStack;Lnet/minecraft/client/renderer/IRenderTypeBuffer;Lnet/minecraft/client/renderer/RenderType;ZZ)Lcom/mojang/blaze3d/vertex/IVertexBuilder;';
+                        insn.desc = '(Lnet/minecraft/world/item/ItemStack;Lnet/minecraft/client/renderer/MultiBufferSource;Lnet/minecraft/client/renderer/RenderType;ZZ)Lcom/mojang/blaze3d/vertex/VertexConsumer;';
                         insn.owner = 'rusty/vanillo/client/glint/GlintHooks';
                         insn.name = 'getElytraFoil';
 
@@ -161,33 +192,28 @@ function initializeCoreMod() {
         },
         'BipedArmorLayer': {
             'target': {
-                'type': 'CLASS',
-                'name': 'net.minecraft.client.renderer.entity.layers.BipedArmorLayer'
+                'type': 'METHOD',
+                'class': HumanoidArmorLayer_class,
+                'methodName': HumanoidArmorLayer_renderArmorPiece,
+                'methodDesc': HumanoidArmorLayer_renderArmorPiece_desc
             },
-            'transformer': function(klass) {
-                for (var j = 0; j < klass.methods.size(); ++j) {
-                    var method = klass.methods.get(j);
-                    var insnList = method.instructions; // method instructions
+            'transformer': function(method) {
+                var insnList = method.instructions; // method instructions
 
-                    if (method.name.equals(ASMAPI.mapMethod('func_241739_a_'))) { // renderArmorPiece
-                        for (var i = 0; i < insnList.size(); ++i) {
-                            var insn = insnList.get(i);
+                for (var i = 0; i < insnList.size(); ++i) {
+                    var insn = insnList.get(i);
 
-                            if (insn.getOpcode() == Opcodes.ASTORE) {
-                                insnList.insertBefore(insn.getNext(), ASMAPI.listOf(
-                                    new FieldInsnNode(Opcodes.GETSTATIC, 'rusty/vanillo/client/glint/GlintHooks', 'ARMOR_CONTEXT', 'Ljava/lang/ThreadLocal;'),
-                                    new VarInsnNode(Opcodes.ALOAD, 7),
-                                    new MethodInsnNode(Opcodes.INVOKEVIRTUAL, 'java/lang/ThreadLocal', 'set', '(Ljava/lang/Object;)V', false)
-                                ));
+                    if (insn.getOpcode() == Opcodes.ASTORE) {
+                        insnList.insertBefore(insn.getNext(), ASMAPI.listOf(
+                            new FieldInsnNode(Opcodes.GETSTATIC, 'rusty/vanillo/client/glint/GlintHooks', 'ARMOR_CONTEXT', 'Ljava/lang/ThreadLocal;'),
+                            new VarInsnNode(Opcodes.ALOAD, 7),
+                            new MethodInsnNode(Opcodes.INVOKEVIRTUAL, 'java/lang/ThreadLocal', 'set', '(Ljava/lang/Object;)V', false)
+                        ));
 
-                                ASMAPI.log('DEBUG', 'Patched BipedLayer at renderArmorPiece');
-                                break;
-                            }
-                        }
+                        ASMAPI.log('DEBUG', 'Patched BipedLayer at renderArmorPiece');
+                        break;
                     }
                 }
-
-                return klass;
             }
         }
     }
@@ -213,7 +239,7 @@ function patchCompassFoil(list, invokestatic, newName) {
     // redirect to hook
     invokestatic.owner = "rusty/vanillo/client/glint/GlintHooks";
     invokestatic.name = newName
-    invokestatic.desc = "(Lnet/minecraft/item/ItemStack;Lnet/minecraft/client/renderer/IRenderTypeBuffer;Lnet/minecraft/client/renderer/RenderType;Lcom/mojang/blaze3d/matrix/MatrixStack$Entry;)Lcom/mojang/blaze3d/vertex/IVertexBuilder;";
+    invokestatic.desc = "(Lnet/minecraft/world/item/ItemStack;Lnet/minecraft/client/renderer/MultiBufferSource;Lnet/minecraft/client/renderer/RenderType;Lcom/mojang/blaze3d/vertex/PoseStack$Pose;)Lcom/mojang/blaze3d/vertex/VertexConsumer;";
 
     return function() {
         list.insertBefore(aload5, aload1);
@@ -228,7 +254,7 @@ function patchItemFoil(list, invokestatic, newName) {
     // redirect to hook
     invokestatic.owner = "rusty/vanillo/client/glint/GlintHooks";
     invokestatic.name = newName;
-    invokestatic.desc = "(Lnet/minecraft/item/ItemStack;Lnet/minecraft/client/renderer/IRenderTypeBuffer;Lnet/minecraft/client/renderer/RenderType;ZZ)Lcom/mojang/blaze3d/vertex/IVertexBuilder;";
+    invokestatic.desc = "(Lnet/minecraft/world/item/ItemStack;Lnet/minecraft/client/renderer/MultiBufferSource;Lnet/minecraft/client/renderer/RenderType;ZZ)Lcom/mojang/blaze3d/vertex/VertexConsumer;";
 
     return function() {
         list.insertBefore(aload5, aload1);

@@ -2,18 +2,18 @@ package rusty.vanillo.generate;
 
 import com.google.common.collect.Maps;
 import net.minecraft.data.DataGenerator;
-import net.minecraft.data.IFinishedRecipe;
-import net.minecraft.data.RecipeProvider;
-import net.minecraft.data.ShapedRecipeBuilder;
-import net.minecraft.data.ShapelessRecipeBuilder;
-import net.minecraft.data.SmithingRecipeBuilder;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.item.crafting.Ingredient;
+import net.minecraft.data.recipes.FinishedRecipe;
+import net.minecraft.data.recipes.RecipeProvider;
+import net.minecraft.data.recipes.ShapedRecipeBuilder;
+import net.minecraft.data.recipes.ShapelessRecipeBuilder;
+import net.minecraft.data.recipes.UpgradeRecipeBuilder;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.ItemTags;
-import net.minecraft.util.IItemProvider;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.item.crafting.Ingredient;
+import net.minecraft.world.level.ItemLike;
 import net.minecraftforge.common.Tags;
 import rusty.vanillo.Vanillo;
 import rusty.vanillo.registry.VItems;
@@ -30,7 +30,7 @@ public class VRecipeProvider extends RecipeProvider {
     }
 
     @Override
-    protected void buildShapelessRecipes(Consumer<IFinishedRecipe> consumer) {
+    protected void buildCraftingRecipes(Consumer<FinishedRecipe> consumer) {
         createSlabRecipes(consumer);
         createRailRecipes(consumer);
         createVoidEquipmentRecipes(consumer);
@@ -39,7 +39,7 @@ public class VRecipeProvider extends RecipeProvider {
         createFoodRecipes(consumer);
     }
 
-    private void createSlabRecipes(Consumer<IFinishedRecipe> localConsumer) {
+    private void createSlabRecipes(Consumer<FinishedRecipe> localConsumer) {
         // Puts slabs and their related blocks into map.
         Map<Item, Item> slabsAndBlocks = Maps.newHashMap();
 
@@ -80,17 +80,17 @@ public class VRecipeProvider extends RecipeProvider {
         // Iterates map keys which are slab items.
         for (Item slab : slabsAndBlocks.keySet()) {
             // Creates recipe from each slab to its related blockItem.
-            ShapedRecipeBuilder.shaped(slabsAndBlocks.get(slab).getItem(), 1)
+            ShapedRecipeBuilder.shaped(slabsAndBlocks.get(slab), 1)
                     .pattern("X")
                     .pattern("X")
                     .define('X', Ingredient.of(slab))
-                    .unlockedBy("has_item", has(slab.getItem()))
+                    .unlockedBy("has_item", has(slab))
                     // avoid overriding vanilla recipes
                     .save(localConsumer, new ResourceLocation(Vanillo.ID, slab.getRegistryName().getPath() + "_from_slabs"));
         }
     }
 
-    private void createBlockRecipes(Consumer<IFinishedRecipe> consumer) {
+    private void createBlockRecipes(Consumer<FinishedRecipe> consumer) {
         ShapedRecipeBuilder.shaped(VItems.RECYCLER.get(), 1)
                 .define('D', Tags.Items.STORAGE_BLOCKS_IRON)
                 .define('R', Tags.Items.GEMS_DIAMOND)
@@ -104,7 +104,7 @@ public class VRecipeProvider extends RecipeProvider {
                 .save(consumer);
     }
 
-    private void createRailRecipes(Consumer<IFinishedRecipe> consumer) {
+    private void createRailRecipes(Consumer<FinishedRecipe> consumer) {
         ShapedRecipeBuilder.shaped(VItems.DIAMOND_POWERED_RAIL.get(), 12)
                 .define('D', Tags.Items.GEMS_DIAMOND)
                 .define('R', Tags.Items.DUSTS_REDSTONE)
@@ -156,7 +156,7 @@ public class VRecipeProvider extends RecipeProvider {
 
     }
 
-    private void createFoodRecipes(Consumer<IFinishedRecipe> consumer) {
+    private void createFoodRecipes(Consumer<FinishedRecipe> consumer) {
         ShapedRecipeBuilder.shaped(VItems.ENDER_OMELETTE.get())
                 .define('D', Items.BLAZE_POWDER)
                 .define('R', Items.ENDER_EYE)
@@ -171,7 +171,7 @@ public class VRecipeProvider extends RecipeProvider {
     }
 
 
-    private void createVoidEquipmentRecipes(Consumer<IFinishedRecipe> consumer) {
+    private void createVoidEquipmentRecipes(Consumer<FinishedRecipe> consumer) {
         Item voidIngot = VItems.VOID_SHARD.get();
 
         ShapelessRecipeBuilder.shapeless(VItems.VOID_SHARD.get())
@@ -219,28 +219,28 @@ public class VRecipeProvider extends RecipeProvider {
      * @param secondSlot Upgrade material (second slot)
      * @param result Resulting upgraded item
      */
-    private void smithing(Consumer<IFinishedRecipe> consumer, Ingredient firstSlot, Item secondSlot, Item result) {
-        SmithingRecipeBuilder.smithing(firstSlot, Ingredient.of(secondSlot), result).unlocks("has_item", has(secondSlot)).save(consumer, result.getRegistryName().getPath() + "_smithing");
+    private void smithing(Consumer<FinishedRecipe> consumer, Ingredient firstSlot, Item secondSlot, Item result) {
+        UpgradeRecipeBuilder.smithing(firstSlot, Ingredient.of(secondSlot), result).unlocks("has_item", has(secondSlot)).save(consumer, result.getRegistryName().getPath() + "_smithing");
     }
 
     // Recycling
-    public void recycling(Consumer<IFinishedRecipe> consumer, Ingredient input, ItemStack output, float xp, int duration, String suffix) { // 200 duration is normal for furnace speed
+    public void recycling(Consumer<FinishedRecipe> consumer, Ingredient input, ItemStack output, float xp, int duration, String suffix) { // 200 duration is normal for furnace speed
         RecycleRecipeBuilder.recycling(input, output, xp, duration).unlockedBy("has_recycler", has(output.getItem())).save(consumer, output.getItem() + "_from_recycling" + suffix);
     }
 
-    public void recycling(Consumer<IFinishedRecipe> consumer, Ingredient input, ItemStack output, float xp, int duration) { // 200 duration is normal for furnace speed
+    public void recycling(Consumer<FinishedRecipe> consumer, Ingredient input, ItemStack output, float xp, int duration) { // 200 duration is normal for furnace speed
         recycling(consumer, input, output, xp, duration, "");
     }
 
-    public void recycling(Consumer<IFinishedRecipe> consumer, IItemProvider input, ItemStack output, float xp, int duration) { // 200 duration is normal for furnace speed
+    public void recycling(Consumer<FinishedRecipe> consumer, ItemLike input, ItemStack output, float xp, int duration) { // 200 duration is normal for furnace speed
         recycling(consumer, Ingredient.of(input), output, xp, duration, "_" + input.asItem().getRegistryName().getPath());
     }
 
-    public void recycling(Consumer<IFinishedRecipe> consumer, IItemProvider input, IItemProvider output, float xp, int duration) { // 200 duration is normal for furnace speed
+    public void recycling(Consumer<FinishedRecipe> consumer, ItemLike input, ItemLike output, float xp, int duration) { // 200 duration is normal for furnace speed
         recycling(consumer, Ingredient.of(input), new ItemStack(output, 1), xp, duration, "_" + input.asItem().getRegistryName().getPath());
     }
 
-    private void addRecyclingRecipes(Consumer<IFinishedRecipe> consumer) {
+    private void addRecyclingRecipes(Consumer<FinishedRecipe> consumer) {
         // Furnace Xp for cobble is 0.1, Charcoal is 0.15, Cooked Beef is 0.35, Iron Ingot is 0.7, Gold Ingot is 1.0
         // Check usages (alt F7) of CookingRecipeBuilder.smelting to see more
         // Example recipe
@@ -264,7 +264,7 @@ public class VRecipeProvider extends RecipeProvider {
         recycling(consumer, Items.ENDER_CHEST, new ItemStack(Items.OBSIDIAN, 5), 0.7f, 400); // Add Ender Eye to loot table
         recycling(consumer, Items.CHEST, new ItemStack(Items.OAK_PLANKS, 6), 0.15f, 150);
         recycling(consumer, Items.ENCHANTING_TABLE, new ItemStack(Items.OBSIDIAN, 4), 0.7f, 400); // Add Diamond and Book to loot table
-        recycling(consumer, Items.JUKEBOX, Items.DIAMOND, 0.35f, 200); //Add plalanks toloot table
+        recycling(consumer, Items.JUKEBOX, Items.DIAMOND, 0.35f, 200); //Add planks to loot table
         recycling(consumer, Items.SMOKER, new ItemStack(Items.OAK_LOG, 3), 0.15f, 150); // Add cobblestone to loot table
 
         // Crafting Block Recycling Recipes

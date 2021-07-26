@@ -1,23 +1,24 @@
+/*
 package rusty.vanillo.compat.jei;
 
 import mezz.jei.api.recipe.category.IRecipeCategory;
 import net.minecraft.client.Minecraft;
-import net.minecraft.inventory.IInventory;
-import net.minecraft.item.crafting.IRecipe;
-import net.minecraft.item.crafting.IRecipeType;
-import net.minecraft.item.crafting.RecipeManager;
+import net.minecraft.world.Container;
+import net.minecraft.world.item.crafting.Recipe;
+import net.minecraft.world.item.crafting.RecipeManager;
+import net.minecraft.world.item.crafting.RecipeType;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class RecipeValidator<T extends IRecipe<?>> {
+public class RecipeValidator<T extends Recipe<?>> {
     private final IRecipeCategory<T> category;
 
     public RecipeValidator(IRecipeCategory<T> category) {
         this.category = category;
     }
 
-    public <C extends IInventory, R extends IRecipe<C>> List<T> getResults(IRecipeType<R> type) {
+    public <C extends Container, R extends Recipe<C>> List<T> getResults(RecipeType<R> type) {
         RecipeManager manager = Minecraft.getInstance().level.getRecipeManager();
         ArrayList<R> list = new ArrayList<>();
 
@@ -43,3 +44,4 @@ public class RecipeValidator<T extends IRecipe<?>> {
         }
     }
 }
+*/

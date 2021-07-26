@@ -1,48 +1,51 @@
 package rusty.vanillo.client.glint;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
-import com.mojang.blaze3d.vertex.IVertexBuilder;
-import com.mojang.blaze3d.vertex.MatrixApplyingVertexBuilder;
-import com.mojang.blaze3d.vertex.VertexBuilderUtils;
+
+import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.SheetedDecalTextureGenerator;
+import com.mojang.blaze3d.vertex.VertexConsumer;
+import com.mojang.blaze3d.vertex.VertexMultiConsumer;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.Atlases;
-import net.minecraft.client.renderer.IRenderTypeBuffer;
+import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
-import net.minecraft.item.ItemStack;
+import net.minecraft.client.renderer.Sheets;
+import net.minecraft.world.item.ItemStack;
 
 // Called from the core mods
 public final class GlintHooks {
+    // Just in case
     public static final ThreadLocal<ItemStack> ARMOR_CONTEXT = ThreadLocal.withInitial(() -> ItemStack.EMPTY);
 
-    public static IVertexBuilder aaa(IRenderTypeBuffer p_239386_0_, RenderType p_239386_1_, boolean p_239386_2_, boolean p_239386_3_) {
-        return getArmorFoilBuffer(p_239386_0_, p_239386_1_, p_239386_2_, p_239386_3_);
+    // used for writing one of the core mods but doesn't actually do anything
+    public static VertexConsumer aaa(MultiBufferSource buffers, RenderType type, boolean regularType, boolean p_239386_3_) {
+        return getArmorFoilBuffer(buffers, type, regularType, p_239386_3_);
     }
 
-    public static IVertexBuilder getArmorFoilBuffer(IRenderTypeBuffer buffer, RenderType layer, boolean regularType, boolean p_239386_3_) {
-        return p_239386_3_ ? VertexBuilderUtils.create(buffer.getBuffer(ColoredGlints.getArmorGlint(ARMOR_CONTEXT.get(), regularType)), buffer.getBuffer(layer)) : buffer.getBuffer(layer);
+    public static VertexConsumer getArmorFoilBuffer(MultiBufferSource buffers, RenderType type, boolean regularType, boolean p_239386_3_) {
+        return p_239386_3_ ? VertexMultiConsumer.create(buffers.getBuffer(ColoredGlints.getArmorGlint(ARMOR_CONTEXT.get(), regularType)), buffers.getBuffer(type)) : buffers.getBuffer(type);
     }
 
-    public static IVertexBuilder getElytraFoil(ItemStack stack, IRenderTypeBuffer buffer, RenderType layer, boolean regularType, boolean p_239386_3_) {
-        return p_239386_3_ ? VertexBuilderUtils.create(buffer.getBuffer(ColoredGlints.getArmorGlint(stack, regularType)), buffer.getBuffer(layer)) : buffer.getBuffer(layer);
+    public static VertexConsumer getElytraFoil(ItemStack stack, MultiBufferSource buffers, RenderType type, boolean regularType, boolean p_239386_3_) {
+        return p_239386_3_ ? VertexMultiConsumer.create(buffers.getBuffer(ColoredGlints.getArmorGlint(stack, regularType)), buffers.getBuffer(type)) : buffers.getBuffer(type);
     }
 
-    public static IVertexBuilder getFoilBuffer(ItemStack stack, IRenderTypeBuffer p_229113_0_, RenderType p_229113_1_, boolean p_229113_2_, boolean p_229113_3_) {
+    public static VertexConsumer getFoilBuffer(ItemStack stack, MultiBufferSource buffers, RenderType type, boolean direct, boolean p_229113_3_) {
         if (p_229113_3_) {
-            return VertexBuilderUtils.create(p_229113_0_.getBuffer(ColoredGlints.getItemGlint(stack, Minecraft.useShaderTransparency() && p_229113_1_ == Atlases.translucentItemSheet(), p_229113_2_)), p_229113_0_.getBuffer(p_229113_1_));
+            return VertexMultiConsumer.create(buffers.getBuffer(ColoredGlints.getItemGlint(stack, Minecraft.useShaderTransparency() && type == Sheets.translucentItemSheet(), direct)), buffers.getBuffer(type));
         } else {
-            return p_229113_0_.getBuffer(p_229113_1_);
+            return buffers.getBuffer(type);
         }
     }
 
-    public static IVertexBuilder getFoilBufferDirect(ItemStack stack, IRenderTypeBuffer p_239391_0_, RenderType p_239391_1_, boolean p_239391_2_, boolean p_239391_3_) {
-        return p_239391_3_ ? VertexBuilderUtils.create(p_239391_0_.getBuffer(ColoredGlints.getDirectGlint(stack, p_239391_2_)), p_239391_0_.getBuffer(p_239391_1_)) : p_239391_0_.getBuffer(p_239391_1_);
+    public static VertexConsumer getFoilBufferDirect(ItemStack stack, MultiBufferSource buffers, RenderType type, boolean entityGlint, boolean p_239391_3_) {
+        return p_239391_3_ ? VertexMultiConsumer.create(buffers.getBuffer(ColoredGlints.getDirectGlint(stack, entityGlint)), buffers.getBuffer(type)) : buffers.getBuffer(type);
     }
 
-    public static IVertexBuilder getCompassFoilBuffer(ItemStack stack, IRenderTypeBuffer buffer, RenderType layer, MatrixStack.Entry entry) {
-        return VertexBuilderUtils.create(new MatrixApplyingVertexBuilder(buffer.getBuffer(ColoredGlints.getItemGlint(stack, false)), entry.pose(), entry.normal()), buffer.getBuffer(layer));
+    public static VertexConsumer getCompassFoilBuffer(ItemStack stack, MultiBufferSource buffers, RenderType type, PoseStack.Pose pose) {
+        return VertexMultiConsumer.create(new SheetedDecalTextureGenerator(buffers.getBuffer(ColoredGlints.getItemGlint(stack, false)), pose.pose(), pose.normal()), buffers.getBuffer(type));
     }
 
-    public static IVertexBuilder getCompassFoilBufferDirect(ItemStack stack, IRenderTypeBuffer buffer, RenderType layer, MatrixStack.Entry entry) {
-        return VertexBuilderUtils.create(new MatrixApplyingVertexBuilder(buffer.getBuffer(ColoredGlints.getItemGlint(stack, true)), entry.pose(), entry.normal()), buffer.getBuffer(layer));
+    public static VertexConsumer getCompassFoilBufferDirect(ItemStack stack, MultiBufferSource buffers, RenderType type, PoseStack.Pose pose) {
+        return VertexMultiConsumer.create(new SheetedDecalTextureGenerator(buffers.getBuffer(ColoredGlints.getItemGlint(stack, true)), pose.pose(), pose.normal()), buffers.getBuffer(type));
     }
 }

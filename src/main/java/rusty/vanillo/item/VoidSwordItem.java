@@ -1,16 +1,16 @@
 package rusty.vanillo.item;
 
-import net.minecraft.enchantment.EnchantmentHelper;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.item.IItemTier;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.SwordItem;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.SwordItem;
+import net.minecraft.world.item.Tier;
+import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraftforge.event.entity.living.LivingDamageEvent;
 import rusty.vanillo.registry.VEnchantments;
 
 public class VoidSwordItem extends SwordItem {
-    public VoidSwordItem(IItemTier tier, int p_i48460_2_, float p_i48460_3_, Properties p_i48460_4_) {
+    public VoidSwordItem(Tier tier, int p_i48460_2_, float p_i48460_3_, Properties p_i48460_4_) {
         super(tier, p_i48460_2_, p_i48460_3_, p_i48460_4_);
     }
 

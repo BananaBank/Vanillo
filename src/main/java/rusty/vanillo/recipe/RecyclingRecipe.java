@@ -1,10 +1,10 @@
 package rusty.vanillo.recipe;
 
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.crafting.AbstractCookingRecipe;
-import net.minecraft.item.crafting.IRecipeSerializer;
-import net.minecraft.item.crafting.Ingredient;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.AbstractCookingRecipe;
+import net.minecraft.world.item.crafting.Ingredient;
+import net.minecraft.world.item.crafting.RecipeSerializer;
 import rusty.vanillo.registry.VItems;
 import rusty.vanillo.registry.VRecipeSerializers;
 
@@ -19,7 +19,7 @@ public class RecyclingRecipe extends AbstractCookingRecipe {
     }
 
     @Override
-    public IRecipeSerializer<?> getSerializer() {
+    public RecipeSerializer<?> getSerializer() {
         return VRecipeSerializers.RECYCLING.get();
     }
 }

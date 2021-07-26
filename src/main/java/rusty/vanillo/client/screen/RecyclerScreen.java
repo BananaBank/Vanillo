@@ -1,35 +1,39 @@
 package rusty.vanillo.client.screen;
 
 
-import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.systems.RenderSystem;
-import net.minecraft.client.gui.screen.inventory.ContainerScreen;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.text.ITextComponent;
+import com.mojang.blaze3d.vertex.PoseStack;
+import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
+import net.minecraft.client.renderer.GameRenderer;
+import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.player.Inventory;
 import rusty.vanillo.Vanillo;
-import rusty.vanillo.container.RecyclerContainer;
+import rusty.vanillo.container.RecyclerMenu;
 
-public class RecyclerScreen extends ContainerScreen<RecyclerContainer> {
+public class RecyclerScreen extends AbstractContainerScreen<RecyclerMenu> {
     // Gui texture location
     public static final ResourceLocation TEXTURE = new ResourceLocation(Vanillo.ID, "textures/gui/container/recycler_gui.png");
 
     // Default constructor
-    public RecyclerScreen(RecyclerContainer container, PlayerInventory inv, ITextComponent title) {
+    public RecyclerScreen(RecyclerMenu container, Inventory inv, Component title) {
         super(container, inv, title);
     }
 
     @Override // render
-    public void render(MatrixStack stack, int mouseX, int mouseY, float partialTicks) {
+    public void render(PoseStack stack, int mouseX, int mouseY, float partialTicks) {
         renderBackground(stack);
         super.render(stack, mouseX, mouseY, partialTicks);
         renderTooltip(stack, mouseX, mouseY);
     }
 
     @Override // drawGuiBackground
-    protected void renderBg(MatrixStack stack, float partialTicks, int mouseX, int mouseY) {
-        RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
-        this.minecraft.getTextureManager().bind(TEXTURE);
+    protected void renderBg(PoseStack stack, float partialTicks, int mouseX, int mouseY) {
+        RenderSystem.setShader(GameRenderer::getPositionTexShader);
+        RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
+        RenderSystem.setShaderTexture(0, TEXTURE);
+
+        this.minecraft.getTextureManager().bindForSetup(TEXTURE);
         int guiLeft = leftPos;
         int guiTop = topPos;
         this.blit(stack, guiLeft, guiTop, 0, 0, this.imageWidth, this.imageHeight);
@@ -46,7 +50,7 @@ public class RecyclerScreen extends ContainerScreen<RecyclerContainer> {
     }
 
     @Override // UV = XY Texture coordinates
-    public void blit(MatrixStack stack, int xPos, int yPos, int uMin, int vMin, int uMax, int vMax) {
+    public void blit(PoseStack stack, int xPos, int yPos, int uMin, int vMin, int uMax, int vMax) {
         super.blit(stack, xPos, yPos, uMin, vMin, uMax, vMax);
     }
 }

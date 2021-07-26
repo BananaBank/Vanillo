@@ -1,6 +1,8 @@
+/*
 package rusty.vanillo.compat.jei;
 
 import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.vertex.PoseStack;
 import mezz.jei.api.constants.VanillaTypes;
 import mezz.jei.api.gui.IRecipeLayout;
 import mezz.jei.api.gui.drawable.IDrawable;
@@ -10,10 +12,10 @@ import mezz.jei.api.helpers.IGuiHelper;
 import mezz.jei.api.ingredients.IIngredients;
 import mezz.jei.api.recipe.category.IRecipeCategory;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.FontRenderer;
-import net.minecraft.client.resources.I18n;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.client.gui.Font;
+import net.minecraft.client.resources.language.I18n;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.ItemStack;
 import rusty.vanillo.Vanillo;
 import rusty.vanillo.client.screen.RecyclerScreen;
 import rusty.vanillo.recipe.RecyclingRecipe;
@@ -67,14 +69,14 @@ public class RecyclingRecipeCategory implements IRecipeCategory<RecyclingRecipe>
     }
 
     @Override
-    public void draw(RecyclingRecipe recipe, MatrixStack stack, double mouseX, double mouseY) {
+    public void draw(RecyclingRecipe recipe, PoseStack stack, double mouseX, double mouseY) {
         animatedFlame.draw(stack, 1, 20);
         arrow.draw(stack, 25, 18);
         float experience = recipe.getExperience();
 
         if (experience > 0.0F) {
             String xp = I18n.get("gui.jei.category.smelting.experience", new Object[]{experience});
-            FontRenderer font = Minecraft.getInstance().font;
+            Font font = Minecraft.getInstance().font;
             int width = font.width(xp);
             font.draw(stack, xp, (float)(this.background.getWidth() - width), 0.0F, -8355712);
         }
@@ -93,3 +95,4 @@ public class RecyclingRecipeCategory implements IRecipeCategory<RecyclingRecipe>
         guiItemStacks.set(ingredients);
     }
 }
+*/

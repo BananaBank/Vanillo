@@ -1,7 +1,7 @@
 package rusty.vanillo.generate;
 
 import net.minecraft.data.DataGenerator;
-import net.minecraft.enchantment.Enchantment;
+import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraftforge.common.data.LanguageProvider;
 import rusty.vanillo.Vanillo;
 import rusty.vanillo.registry.VBlocks;

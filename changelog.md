@@ -1,3 +1,6 @@
+##Vanillo 2.0.0
+- Ported to 1.17
+
 ##Vanillo 1.1
 - Added new Punisher Enchantment
 - Fixed Zombie Villager Conductor textures

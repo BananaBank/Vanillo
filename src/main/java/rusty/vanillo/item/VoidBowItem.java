@@ -2,27 +2,27 @@ package rusty.vanillo.item;
 
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
-import net.minecraft.enchantment.EnchantmentHelper;
-import net.minecraft.enchantment.Enchantments;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.effect.LightningBoltEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.entity.projectile.AbstractArrowEntity;
-import net.minecraft.item.ArrowItem;
-import net.minecraft.item.BowItem;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.particles.ParticleTypes;
-import net.minecraft.potion.EffectInstance;
-import net.minecraft.potion.Effects;
+import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.stats.Stats;
-import net.minecraft.util.SoundCategory;
-import net.minecraft.util.SoundEvents;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.world.World;
+import net.minecraft.util.Mth;
+import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.effect.MobEffects;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.LightningBolt;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.entity.projectile.AbstractArrow;
+import net.minecraft.world.item.ArrowItem;
+import net.minecraft.world.item.BowItem;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.item.enchantment.EnchantmentHelper;
+import net.minecraft.world.item.enchantment.Enchantments;
+import net.minecraft.world.level.Level;
 import net.minecraftforge.event.entity.EntityLeaveWorldEvent;
 import net.minecraftforge.event.entity.living.LivingDamageEvent;
 import rusty.vanillo.registry.VEnchantments;
@@ -30,11 +30,11 @@ import rusty.vanillo.registry.VEnchantments;
 import java.util.UUID;
 
 public class VoidBowItem extends BowItem {
-    private static final EffectInstance[] IMPULSE_EFFECT = new EffectInstance[] {
-            new EffectInstance(Effects.POISON, 100, 1, false, false, false, null),
-            new EffectInstance(Effects.WITHER, 100, 1, false, false, false, null),
-            new EffectInstance(Effects.MOVEMENT_SLOWDOWN, 100, 1, false, false, false, null),
-            new EffectInstance(Effects.WEAKNESS, 200, 1, false, false, false, null)
+    private static final MobEffectInstance[] IMPULSE_EFFECT = new MobEffectInstance[] {
+            new MobEffectInstance(MobEffects.POISON, 100, 1, false, false, false, null),
+            new MobEffectInstance(MobEffects.WITHER, 100, 1, false, false, false, null),
+            new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 100, 1, false, false, false, null),
+            new MobEffectInstance(MobEffects.WEAKNESS, 200, 1, false, false, false, null)
     };
     public static final Object2IntMap<UUID> ARROW_BANISH_LEVELS = new Object2IntOpenHashMap<>();
     public static final Object2IntMap<UUID> ARROW_ABYSS_LEVELS = new Object2IntOpenHashMap<>();
@@ -44,16 +44,16 @@ public class VoidBowItem extends BowItem {
     }
 
     @Override
-    public AbstractArrowEntity customArrow(AbstractArrowEntity arrow) {
+    public AbstractArrow customArrow(AbstractArrow arrow) {
         arrow.setBaseDamage(3.0);
         return arrow;
     }
 
     @Override
-    public void releaseUsing(ItemStack bow, World level, LivingEntity player, int duration) {
-        if (player instanceof PlayerEntity) {
-            PlayerEntity playerentity = (PlayerEntity)player;
-            boolean flag = playerentity.abilities.instabuild || EnchantmentHelper.getItemEnchantmentLevel(Enchantments.INFINITY_ARROWS, bow) > 0;
+    public void releaseUsing(ItemStack bow, Level level, LivingEntity player, int duration) {
+        if (player instanceof Player) {
+            Player playerentity = (Player)player;
+            boolean flag = playerentity.getAbilities().instabuild || EnchantmentHelper.getItemEnchantmentLevel(Enchantments.INFINITY_ARROWS, bow) > 0;
             ItemStack itemstack = playerentity.getProjectile(bow);
 
             int i = this.getUseDuration(bow) - duration;
@@ -67,17 +67,18 @@ public class VoidBowItem extends BowItem {
 
                 float f = getPowerForTime(i);
                 if (!((double)f < 0.1D)) {
-                    boolean flag1 = playerentity.abilities.instabuild || (itemstack.getItem() instanceof ArrowItem && ((ArrowItem)itemstack.getItem()).isInfinite(itemstack, bow, playerentity));
+                    boolean flag1 = playerentity.getAbilities().instabuild || (itemstack.getItem() instanceof ArrowItem && ((ArrowItem)itemstack.getItem()).isInfinite(itemstack, bow, playerentity));
                     if (!level.isClientSide) {
                         ArrowItem arrowitem = (ArrowItem)(itemstack.getItem() instanceof ArrowItem ? itemstack.getItem() : Items.ARROW);
-                        AbstractArrowEntity abstractarrowentity = arrowitem.createArrow(level, itemstack, playerentity);
+                        AbstractArrow abstractarrowentity = arrowitem.createArrow(level, itemstack, playerentity);
                         abstractarrowentity = customArrow(abstractarrowentity);
-                        abstractarrowentity.shootFromRotation(playerentity, playerentity.xRot, playerentity.yRot, 0.0F, f * 3.0F, 1.0F);
+                        abstractarrowentity.shootFromRotation(playerentity, playerentity.getXRot(), playerentity.getYRot(), 0.0F, f * 3.0F, 1.0F);
                         // Get the level from the bow then apply it to the arrow
                         UUID uuid = abstractarrowentity.getUUID();
 
                         int banish = EnchantmentHelper.getItemEnchantmentLevel(VEnchantments.BANISHMENT.get(), bow);
                         int abyss = EnchantmentHelper.getItemEnchantmentLevel(VEnchantments.ABYSSAL_IMPULSE.get(), bow);
+
                         if (banish != 0) {
                             ARROW_BANISH_LEVELS.put(uuid, banish);
                         }
@@ -104,18 +105,18 @@ public class VoidBowItem extends BowItem {
                         }
 
                         bow.hurtAndBreak(1, playerentity, playerIn -> playerIn.broadcastBreakEvent(playerentity.getUsedItemHand()));
-                        if (flag1 || playerentity.abilities.instabuild && (itemstack.getItem() == Items.SPECTRAL_ARROW || itemstack.getItem() == Items.TIPPED_ARROW)) {
-                            abstractarrowentity.pickup = AbstractArrowEntity.PickupStatus.CREATIVE_ONLY;
+                        if (flag1 || playerentity.getAbilities().instabuild && (itemstack.getItem() == Items.SPECTRAL_ARROW || itemstack.getItem() == Items.TIPPED_ARROW)) {
+                            abstractarrowentity.pickup = AbstractArrow.Pickup.CREATIVE_ONLY;
                         }
 
                         level.addFreshEntity(abstractarrowentity);
                     }
 
-                    level.playSound(null, playerentity.getX(), playerentity.getY(), playerentity.getZ(), SoundEvents.ARROW_SHOOT, SoundCategory.PLAYERS, 1.0F, 1.0F / (random.nextFloat() * 0.4F + 1.2F) + f * 0.5F);
-                    if (!flag1 && !playerentity.abilities.instabuild) {
+                    level.playSound(null, playerentity.getX(), playerentity.getY(), playerentity.getZ(), SoundEvents.ARROW_SHOOT, SoundSource.PLAYERS, 1.0F, 1.0F / (level.random.nextFloat() * 0.4F + 1.2F) + f * 0.5F);
+                    if (!flag1 && !playerentity.getAbilities().instabuild) {
                         itemstack.shrink(1);
                         if (itemstack.isEmpty()) {
-                            playerentity.inventory.removeItem(itemstack);
+                            playerentity.getInventory().removeItem(itemstack);
                         }
                     }
 
@@ -131,15 +132,15 @@ public class VoidBowItem extends BowItem {
     }
 
     public static void abyssalImpulse(LivingDamageEvent event) {
-        AbstractArrowEntity arrow;
+        AbstractArrow arrow;
         Entity entity = event.getSource().getDirectEntity();
-        if (entity instanceof AbstractArrowEntity) {
-            arrow = (AbstractArrowEntity) entity;
+        if (entity instanceof AbstractArrow) {
+            arrow = (AbstractArrow) entity;
         } else {
             // If we're not an arrow skip the event
             return;
         }
-        World level = arrow.level;
+        Level level = arrow.level;
         // Remove from the map after we're done
         int abyssLevel = ARROW_ABYSS_LEVELS.removeInt(arrow.getUUID());
         if (abyssLevel == 0) {
@@ -148,22 +149,22 @@ public class VoidBowItem extends BowItem {
         LivingEntity target = event.getEntityLiving();
         // If the chance succeeds
         if (level.random.nextInt(2) == 0) {
-            EffectInstance choice = IMPULSE_EFFECT[level.random.nextInt(4)];
-            target.addEffect(new EffectInstance(choice.getEffect(), choice.getDuration(), choice.getAmplifier(), false, true));
+            MobEffectInstance choice = IMPULSE_EFFECT[level.random.nextInt(4)];
+            target.addEffect(new MobEffectInstance(choice.getEffect(), choice.getDuration(), choice.getAmplifier(), false, true));
         }
 
     }
 
     public static void banish(LivingDamageEvent event) {
-        AbstractArrowEntity arrow;
+        AbstractArrow arrow;
         Entity entity = event.getSource().getDirectEntity();
-        if (entity instanceof AbstractArrowEntity) {
-            arrow = (AbstractArrowEntity) entity;
+        if (entity instanceof AbstractArrow) {
+            arrow = (AbstractArrow) entity;
         } else {
             // If we're not an arrow skip the event
             return;
         }
-        World level = arrow.level;
+        Level level = arrow.level;
         // Remove from the map after we're done
         int banishLevel = ARROW_BANISH_LEVELS.removeInt(arrow.getUUID());
         // Calculates the base chance from the book level. Higher book levels
@@ -183,7 +184,7 @@ public class VoidBowItem extends BowItem {
             }
         }
         // Forces this number to be over 0
-        banishChance = MathHelper.clamp(banishChance, 1, Integer.MAX_VALUE);
+        banishChance = Mth.clamp(banishChance, 1, Integer.MAX_VALUE);
         int bound = (int) Math.ceil(100.0f / ((float) banishChance));
         int randomNumber = level.random.nextInt(bound);
         // If chance is successful and target has below 25% of their max hp
@@ -191,14 +192,14 @@ public class VoidBowItem extends BowItem {
             target.setHealth(0);
 
             // Spawn lightning
-            LightningBoltEntity lightning = EntityType.LIGHTNING_BOLT.create(level);
+            LightningBolt lightning = EntityType.LIGHTNING_BOLT.create(level);
             double targetPosX = target.getX();
             double targetPosY = target.getY();
             double targetPosZ = target.getZ();
             lightning.moveTo(targetPosX, targetPosY, targetPosZ);
             lightning.setVisualOnly(true);
             Entity owner = event.getSource().getEntity();
-            lightning.setCause(owner instanceof ServerPlayerEntity ? (ServerPlayerEntity)owner : null);
+            lightning.setCause(owner instanceof ServerPlayer ? (ServerPlayer)owner : null);
             level.addFreshEntity(lightning);
             level.addParticle(ParticleTypes.CRIT, targetPosX, targetPosY, targetPosZ, 100, 100, 100);
         }

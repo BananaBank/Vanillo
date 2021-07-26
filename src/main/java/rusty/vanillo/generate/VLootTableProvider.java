@@ -3,27 +3,27 @@ package rusty.vanillo.generate;
 import com.google.common.collect.Maps;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import net.minecraft.advancements.criterion.StatePropertiesPredicate;
-import net.minecraft.block.Block;
-import net.minecraft.block.SlabBlock;
+import net.minecraft.advancements.critereon.StatePropertiesPredicate;
 import net.minecraft.data.DataGenerator;
-import net.minecraft.data.DirectoryCache;
-import net.minecraft.data.IDataProvider;
-import net.minecraft.data.LootTableProvider;
-import net.minecraft.loot.ConstantRange;
-import net.minecraft.loot.ItemLootEntry;
-import net.minecraft.loot.LootParameterSets;
-import net.minecraft.loot.LootPool;
-import net.minecraft.loot.LootTable;
-import net.minecraft.loot.LootTableManager;
-import net.minecraft.loot.conditions.BlockStateProperty;
-import net.minecraft.loot.conditions.SurvivesExplosion;
-import net.minecraft.loot.functions.ExplosionDecay;
-import net.minecraft.loot.functions.SetCount;
-import net.minecraft.state.properties.BlockStateProperties;
-import net.minecraft.state.properties.SlabType;
-import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.fml.RegistryObject;
+import net.minecraft.data.DataProvider;
+import net.minecraft.data.HashCache;
+import net.minecraft.data.loot.LootTableProvider;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.SlabBlock;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.level.block.state.properties.SlabType;
+import net.minecraft.world.level.storage.loot.LootPool;
+import net.minecraft.world.level.storage.loot.LootTable;
+import net.minecraft.world.level.storage.loot.LootTables;
+import net.minecraft.world.level.storage.loot.entries.LootItem;
+import net.minecraft.world.level.storage.loot.functions.ApplyExplosionDecay;
+import net.minecraft.world.level.storage.loot.functions.SetItemCountFunction;
+import net.minecraft.world.level.storage.loot.parameters.LootContextParamSets;
+import net.minecraft.world.level.storage.loot.predicates.ExplosionCondition;
+import net.minecraft.world.level.storage.loot.predicates.LootItemBlockStatePropertyCondition;
+import net.minecraft.world.level.storage.loot.providers.number.ConstantValue;
+import net.minecraftforge.fmllegacy.RegistryObject;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import rusty.vanillo.registry.VBlocks;
@@ -44,17 +44,17 @@ public class VLootTableProvider extends LootTableProvider {
     }
 
     @Override
-    public void run(DirectoryCache directoryCache) {
+    public void run(HashCache hashCache) {
         addBlockLootTables();
 
         HashMap<ResourceLocation, LootTable> namespacedTables = new HashMap<>(blockTables.size());
 
         for (Map.Entry<Block, LootTable.Builder> entry : blockTables.entrySet()) {
             // Add tables to the block loot parameter set automatically
-            namespacedTables.put(entry.getKey().getLootTable(), entry.getValue().setParamSet(LootParameterSets.BLOCK).build());
+            namespacedTables.put(entry.getKey().getLootTable(), entry.getValue().setParamSet(LootContextParamSets.BLOCK).build());
         }
 
-        writeLootTables(namespacedTables, directoryCache);
+        writeLootTables(namespacedTables, hashCache);
     }
 
     // Add block loot tables
@@ -77,7 +77,7 @@ public class VLootTableProvider extends LootTableProvider {
     // Loot table to drop the block itself. Think Diamond Block, Sand, etc.
     private void dropSelf(RegistryObject<Block> block) {
         // refer to the diamond block loot table for this one
-        addLoot(block, new LootTable.Builder().withPool(new LootPool.Builder().setRolls(ConstantRange.exactly(1)).add(ItemLootEntry.lootTableItem(block.get())).when(SurvivesExplosion.survivesExplosion())));
+        addLoot(block, new LootTable.Builder().withPool(new LootPool.Builder().setRolls(ConstantValue.exactly(1)).add(LootItem.lootTableItem(block.get())).when(ExplosionCondition.survivesExplosion())));
     }
 
     // Loot table to drop slabs properly. Think any kind of slab block
@@ -85,13 +85,13 @@ public class VLootTableProvider extends LootTableProvider {
         // refer to the oak slab loot table for this one
         addLoot(slab, new LootTable.Builder().withPool(
                 new LootPool.Builder()
-                        .setRolls(ConstantRange.exactly(1)) // rolls
-                        .add(ItemLootEntry.lootTableItem(slab.get()) // entries
-                                .apply(SetCount.setCount(ConstantRange.exactly(2)) // each call to apply adds function to functions
-                                        .when(BlockStateProperty.hasBlockStateProperties(slab.get()) // "when" is a condition
+                        .setRolls(ConstantValue.exactly(1)) // rolls
+                        .add(LootItem.lootTableItem(slab.get()) // entries
+                                .apply(SetItemCountFunction.setCount(ConstantValue.exactly(2)) // each call to apply adds function to functions
+                                        .when(LootItemBlockStatePropertyCondition.hasBlockStateProperties(slab.get()) // "when" is a condition
                                                 .setProperties(StatePropertiesPredicate.Builder.properties().hasProperty(BlockStateProperties.SLAB_TYPE, SlabType.DOUBLE)) // type double
                                         ))
-                                .apply(ExplosionDecay.explosionDecay())
+                                .apply(ApplyExplosionDecay.explosionDecay())
                         )));
     }
 
@@ -100,14 +100,14 @@ public class VLootTableProvider extends LootTableProvider {
     }
 
     // Saves the loot tables to files
-    private void writeLootTables(Map<ResourceLocation, LootTable> tables, DirectoryCache cache) {
+    private void writeLootTables(Map<ResourceLocation, LootTable> tables, HashCache cache) {
         Path outputFolder = generator.getOutputFolder();
 
         for (Map.Entry<ResourceLocation, LootTable> entry : tables.entrySet()) {
             Path path = outputFolder.resolve("data/" + entry.getKey().getNamespace() + "/loot_tables/" + entry.getKey().getPath() + ".json");
 
             try {
-                IDataProvider.save(GSON, cache, LootTableManager.serialize(entry.getValue()), path);
+                DataProvider.save(GSON, cache, LootTables.serialize(entry.getValue()), path);
             } catch (Exception e) {
                 LOGGER.error("Couldn't write loot table {}", path, e);
             }

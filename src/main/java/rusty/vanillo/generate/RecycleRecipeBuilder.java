@@ -3,22 +3,22 @@ package rusty.vanillo.generate;
 import com.google.gson.JsonObject;
 import net.minecraft.advancements.Advancement;
 import net.minecraft.advancements.AdvancementRewards;
-import net.minecraft.advancements.ICriterionInstance;
-import net.minecraft.advancements.IRequirementsStrategy;
-import net.minecraft.advancements.criterion.RecipeUnlockedTrigger;
-import net.minecraft.data.IFinishedRecipe;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.crafting.IRecipeSerializer;
-import net.minecraft.item.crafting.Ingredient;
-import net.minecraft.util.IItemProvider;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.advancements.CriterionTriggerInstance;
+import net.minecraft.advancements.RequirementsStrategy;
+import net.minecraft.advancements.critereon.RecipeUnlockedTrigger;
+import net.minecraft.data.recipes.FinishedRecipe;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.Ingredient;
+import net.minecraft.world.item.crafting.RecipeSerializer;
+import net.minecraft.world.level.ItemLike;
 import rusty.vanillo.registry.VRecipeSerializers;
 
 import javax.annotation.Nullable;
 import java.util.function.Consumer;
 
 /**
- * Inspired by the {@link net.minecraft.data.CookingRecipeBuilder} if you're wondering
+ * Inspired by the {@link net.minecraft.data.recipes.SimpleCookingRecipeBuilder} if you're wondering
  *
  * @author TheDarkColour
  */
@@ -46,28 +46,29 @@ public class RecycleRecipeBuilder {
         return recycling(input, result, xp, duration, "");
     }
 
-    public static RecycleRecipeBuilder recycling(Ingredient input, IItemProvider result, float xp, int duration) {
+    // todo check if this is used
+    public static RecycleRecipeBuilder recycling(Ingredient input, ItemLike result, float xp, int duration) {
         return recycling(input, new ItemStack(result), xp, duration, "");
     }
 
-    public RecycleRecipeBuilder unlockedBy(String criterionName, ICriterionInstance criterion) {
+    public RecycleRecipeBuilder unlockedBy(String criterionName, CriterionTriggerInstance criterion) {
         this.advancement.addCriterion(criterionName, criterion);
         return this;
     }
 
-    public void save(Consumer<IFinishedRecipe> consumer) {
+    public void save(Consumer<FinishedRecipe> consumer) {
         save(consumer, result.getItem().getRegistryName().getPath());
     }
 
-    public void save(Consumer<IFinishedRecipe> consumer, String path) {
+    public void save(Consumer<FinishedRecipe> consumer, String path) {
         ResourceLocation id = new ResourceLocation(path);
 
         save(consumer, id);
     }
 
-    public void save(Consumer<IFinishedRecipe> consumer, ResourceLocation id) {
+    public void save(Consumer<FinishedRecipe> consumer, ResourceLocation id) {
         ensureValid(id);
-        advancement.parent(new ResourceLocation("recipes/root")).addCriterion("has_the_recipe", RecipeUnlockedTrigger.unlocked(id)).rewards(AdvancementRewards.Builder.recipe(id)).requirements(IRequirementsStrategy.OR);
+        advancement.parent(new ResourceLocation("recipes/root")).addCriterion("has_the_recipe", RecipeUnlockedTrigger.unlocked(id)).rewards(AdvancementRewards.Builder.recipe(id)).requirements(RequirementsStrategy.OR);
         consumer.accept(new Result(id, group == null ? "" : group, input, result, xp, duration, advancement, new ResourceLocation(id.getNamespace(), "recipes/" + result.getItem().getItemCategory().getRecipeFolderName() + "/" + id.getPath())));
     }
 
@@ -77,7 +78,7 @@ public class RecycleRecipeBuilder {
         }
     }
 
-    public static class Result implements IFinishedRecipe {
+    public static class Result implements FinishedRecipe {
         private final ResourceLocation id;
         private final String group;
         private final Ingredient input;
@@ -113,7 +114,7 @@ public class RecycleRecipeBuilder {
             object.addProperty("cookingtime", duration);
         }
 
-        public IRecipeSerializer<?> getType() {
+        public RecipeSerializer<?> getType() {
             return VRecipeSerializers.RECYCLING.get();
         }
 

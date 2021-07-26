@@ -1,7 +1,7 @@
 package rusty.vanillo;
 
-import net.minecraft.item.Item;
-import net.minecraft.item.Items;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.Items;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.RegisterCommandsEvent;
@@ -19,14 +19,14 @@ import rusty.vanillo.feature.VFeatures;
 import rusty.vanillo.item.VoidBowItem;
 import rusty.vanillo.item.VoidSwordItem;
 import rusty.vanillo.recipe.ColoredGlintAnvilRecipe;
+import rusty.vanillo.registry.VBlockEntities;
 import rusty.vanillo.registry.VBlocks;
-import rusty.vanillo.registry.VContainerTypes;
 import rusty.vanillo.registry.VEnchantments;
 import rusty.vanillo.registry.VItems;
-import rusty.vanillo.registry.VPointOfInterestTypes;
+import rusty.vanillo.registry.VMenuTypes;
+import rusty.vanillo.registry.VPoiTypes;
 import rusty.vanillo.registry.VRecipeSerializers;
 import rusty.vanillo.registry.VSoundEvents;
-import rusty.vanillo.registry.VTileEntities;
 import rusty.vanillo.registry.VVillagerProfessions;
 
 /**
@@ -56,11 +56,11 @@ public final class Vanillo {
         VBlocks.BLOCKS.register(modEventBus);
         VItems.ITEMS.register(modEventBus);
         VEnchantments.ENCHANTMENTS.register(modEventBus);
-        VTileEntities.TILE_ENTITIES.register(modEventBus);
+        VBlockEntities.TILE_ENTITIES.register(modEventBus);
         VVillagerProfessions.PROFESSIONS.register(modEventBus);
-        VPointOfInterestTypes.POI_TYPES.register(modEventBus);
+        VPoiTypes.POI_TYPES.register(modEventBus);
         VSoundEvents.SOUND_EVENTS.register(modEventBus);
-        VContainerTypes.CONTAINERS.register(modEventBus);
+        VMenuTypes.MENUS.register(modEventBus);
         VRecipeSerializers.SERIALIZERS.register(modEventBus);
 
         DistExecutor.safeRunWhenOn(Dist.CLIENT, () -> ClientHandler::registerEvents);
