@@ -43,6 +43,13 @@ public class VRecipeProvider extends RecipeProvider {
         // Puts slabs and their related blocks into map.
         Map<Item, Item> slabsAndBlocks = Maps.newHashMap();
 
+        // Dirt and coarse dirt slabs
+        makeSlabsRecipe(localConsumer, Items.DIRT, VItems.DIRT_SLAB.get());
+        makeSlabsRecipe(localConsumer, Items.COARSE_DIRT, VItems.COARSE_DIRT_SLAB.get());
+
+        slabsAndBlocks.put(VItems.COARSE_DIRT_SLAB.get(), Items.COARSE_DIRT);
+        slabsAndBlocks.put(VItems.DIRT_SLAB.get(), Items.DIRT);
+
         slabsAndBlocks.put(Items.OAK_SLAB, Items.OAK_PLANKS);
         slabsAndBlocks.put(Items.SPRUCE_SLAB, Items.SPRUCE_PLANKS);
         slabsAndBlocks.put(Items.BIRCH_SLAB, Items.BIRCH_PLANKS);
@@ -210,6 +217,15 @@ public class VRecipeProvider extends RecipeProvider {
                 .requires(VItems.VOID_BLOCK.get())
                 .unlockedBy("has_item", has(VItems.VOID_SHARD.get()))
                 .save(consumer, "void_crystal_from_block");
+    }
+
+    private void makeSlabsRecipe(Consumer<FinishedRecipe> consumer, Item full, Item slab) {
+        ShapedRecipeBuilder.shaped(slab, 6)
+                .pattern("XXX")
+                .define('X', Ingredient.of(full))
+                .unlockedBy("has_item", has(full))
+                // avoid overriding vanilla recipes
+                .save(consumer, full.getRegistryName());
     }
 
     /**
