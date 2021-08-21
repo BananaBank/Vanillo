@@ -6,6 +6,7 @@ import net.minecraft.data.recipes.FinishedRecipe;
 import net.minecraft.data.recipes.RecipeProvider;
 import net.minecraft.data.recipes.ShapedRecipeBuilder;
 import net.minecraft.data.recipes.ShapelessRecipeBuilder;
+import net.minecraft.data.recipes.SingleItemRecipeBuilder;
 import net.minecraft.data.recipes.UpgradeRecipeBuilder;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.ItemTags;
@@ -32,6 +33,7 @@ public class VRecipeProvider extends RecipeProvider {
     @Override
     protected void buildCraftingRecipes(Consumer<FinishedRecipe> consumer) {
         createSlabRecipes(consumer);
+        createBrickBrickRecipes(consumer);
         createRailRecipes(consumer);
         createVoidEquipmentRecipes(consumer);
         addRecyclingRecipes(consumer);
@@ -39,16 +41,30 @@ public class VRecipeProvider extends RecipeProvider {
         createFoodRecipes(consumer);
     }
 
-    private void createSlabRecipes(Consumer<FinishedRecipe> localConsumer) {
+    private void createBrickBrickRecipes(Consumer<FinishedRecipe> consumer) {
+        brickBricks(consumer, Items.BRICKS, Ingredient.of(Items.BRICKS), VItems.BRICK_BRICKS.get());
+        brickBricks(consumer, Items.STONE_BRICKS, Ingredient.of(Items.STONE_BRICKS, Items.STONE), VItems.STONE_BRICK_BRICKS.get());
+
+        makeSlabsRecipe(consumer, VItems.BRICK_BRICKS.get(), Ingredient.of(VItems.BRICK_BRICKS.get()), VItems.BRICK_BRICK_SLAB.get());
+        makeSlabsRecipe(consumer, VItems.STONE_BRICK_BRICKS.get(), Ingredient.of(Items.STONE_BRICKS, Items.STONE, VItems.STONE_BRICK_BRICKS.get()), VItems.STONE_BRICK_BRICK_SLAB.get());
+
+        makeStairsRecipe(consumer, VItems.BRICK_BRICKS.get(), Ingredient.of(VItems.BRICK_BRICKS.get()), VItems.BRICK_BRICK_STAIRS.get());
+        makeStairsRecipe(consumer, VItems.STONE_BRICK_BRICKS.get(), Ingredient.of(Items.STONE_BRICKS, Items.STONE, VItems.STONE_BRICK_BRICKS.get()), VItems.STONE_BRICK_BRICK_STAIRS.get());
+    }
+
+    private void createSlabRecipes(Consumer<FinishedRecipe> consumer) {
         // Puts slabs and their related blocks into map.
         Map<Item, Item> slabsAndBlocks = Maps.newHashMap();
 
         // Dirt and coarse dirt slabs
-        makeSlabsRecipe(localConsumer, Items.DIRT, VItems.DIRT_SLAB.get());
-        makeSlabsRecipe(localConsumer, Items.COARSE_DIRT, VItems.COARSE_DIRT_SLAB.get());
+        makeSlabsRecipe(consumer, Items.DIRT, Ingredient.of(Items.DIRT), VItems.DIRT_SLAB.get());
+        makeSlabsRecipe(consumer, Items.COARSE_DIRT, Ingredient.of(Items.COARSE_DIRT), VItems.COARSE_DIRT_SLAB.get());
 
         slabsAndBlocks.put(VItems.COARSE_DIRT_SLAB.get(), Items.COARSE_DIRT);
         slabsAndBlocks.put(VItems.DIRT_SLAB.get(), Items.DIRT);
+
+        slabsAndBlocks.put(VItems.BRICK_BRICK_SLAB.get(), VItems.BRICK_BRICKS.get());
+        slabsAndBlocks.put(VItems.STONE_BRICK_BRICK_SLAB.get(), VItems.STONE_BRICK_BRICKS.get());
 
         slabsAndBlocks.put(Items.OAK_SLAB, Items.OAK_PLANKS);
         slabsAndBlocks.put(Items.SPRUCE_SLAB, Items.SPRUCE_PLANKS);
@@ -93,7 +109,7 @@ public class VRecipeProvider extends RecipeProvider {
                     .define('X', Ingredient.of(slab))
                     .unlockedBy("has_item", has(slab))
                     // avoid overriding vanilla recipes
-                    .save(localConsumer, new ResourceLocation(Vanillo.ID, slab.getRegistryName().getPath() + "_from_slabs"));
+                    .save(consumer, new ResourceLocation(Vanillo.ID, slab.getRegistryName().getPath() + "_from_slabs"));
         }
     }
 
@@ -219,13 +235,40 @@ public class VRecipeProvider extends RecipeProvider {
                 .save(consumer, "void_crystal_from_block");
     }
 
-    private void makeSlabsRecipe(Consumer<FinishedRecipe> consumer, Item full, Item slab) {
+    private void makeSlabsRecipe(Consumer<FinishedRecipe> consumer, Item unlockTrigger, Ingredient stonecutterIngredient, Item slab) {
         ShapedRecipeBuilder.shaped(slab, 6)
                 .pattern("XXX")
-                .define('X', Ingredient.of(full))
-                .unlockedBy("has_item", has(full))
-                // avoid overriding vanilla recipes
-                .save(consumer, full.getRegistryName());
+                .define('X', Ingredient.of(unlockTrigger))
+                .unlockedBy("has_item", has(unlockTrigger))
+                .save(consumer, slab.getRegistryName());
+        stonecutter(consumer, unlockTrigger, stonecutterIngredient, slab, 2);
+    }
+
+    private void makeStairsRecipe(Consumer<FinishedRecipe> consumer, Item unlockTrigger, Ingredient stonecutterIngredient, Item stairs) {
+        ShapedRecipeBuilder.shaped(stairs, 4)
+                .pattern("X  ")
+                .pattern("XX ")
+                .pattern("XXX")
+                .define('X', Ingredient.of(unlockTrigger))
+                .unlockedBy("has_item", has(unlockTrigger))
+                .save(consumer, stairs.getRegistryName());
+        stonecutter(consumer, unlockTrigger, stonecutterIngredient, stairs, 1);
+    }
+
+    private void brickBricks(Consumer<FinishedRecipe> consumer, Item unlockTrigger, Ingredient stonecutterIngredient, Item result) {
+        ShapedRecipeBuilder.shaped(result, 4)
+                .pattern("XX")
+                .pattern("XX")
+                .define('X', Ingredient.of(unlockTrigger))
+                .unlockedBy("has_item", has(unlockTrigger))
+                .save(consumer, result.getRegistryName());
+        stonecutter(consumer, unlockTrigger, stonecutterIngredient, result, 1);
+    }
+
+    private void stonecutter(Consumer<FinishedRecipe> consumer, Item unlockTrigger, Ingredient input, Item result, int amount) {
+        SingleItemRecipeBuilder.stonecutting(input, result, amount)
+                .unlockedBy("has_item", has(unlockTrigger))
+                .save(consumer, new ResourceLocation(Vanillo.ID, result.getRegistryName().getPath() + "_stonecutting"));
     }
 
     /**

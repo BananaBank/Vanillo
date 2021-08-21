@@ -62,6 +62,15 @@ public class VLootTableProvider extends LootTableProvider {
         // void equipment
         dropSelf(VBlocks.VOID_BLOCK);
 
+        // recycler
+        dropSelf(VBlocks.RECYCLER);
+
+        // brick bricks + stone brick bricks stairs/blocks
+        dropSelf(VBlocks.BRICK_BRICKS);
+        dropSelf(VBlocks.BRICK_BRICK_STAIRS);
+        dropSelf(VBlocks.STONE_BRICK_BRICKS);
+        dropSelf(VBlocks.STONE_BRICK_BRICK_STAIRS);
+
         // rails
         dropSelf(VBlocks.WOODEN_RAIL);
         dropSelf(VBlocks.GLOWSTONE_RAIL);
@@ -72,10 +81,12 @@ public class VLootTableProvider extends LootTableProvider {
         // extra slabs
         slabLootTable(VBlocks.DIRT_SLAB);
         slabLootTable(VBlocks.COARSE_DIRT_SLAB);
+        slabLootTable(VBlocks.STONE_BRICK_BRICK_SLAB);
+        slabLootTable(VBlocks.BRICK_BRICK_SLAB);
     }
 
     // Loot table to drop the block itself. Think Diamond Block, Sand, etc.
-    private void dropSelf(RegistryObject<Block> block) {
+    private void dropSelf(RegistryObject<? extends Block> block) {
         // refer to the diamond block loot table for this one
         addLoot(block, new LootTable.Builder().withPool(new LootPool.Builder().setRolls(ConstantValue.exactly(1)).add(LootItem.lootTableItem(block.get())).when(ExplosionCondition.survivesExplosion())));
     }

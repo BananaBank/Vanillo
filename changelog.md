@@ -1,3 +1,9 @@
+##Vanillo 2.0.1
+- Fixed missing recipes for Brick Bricks and Stone Brick Bricks
+- Fixed missing recipes for Dirt Slab and Coarse Dirt Slab
+- Fixed missing loot table for Recycler
+- Fixed instabreak Recycler
+
 ##Vanillo 2.0.0
 - Ported to 1.17
 
